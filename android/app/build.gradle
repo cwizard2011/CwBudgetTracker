@@ -77,9 +77,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.budgettracker_fresh"
+    namespace "com.cwbudgettracker"
     defaultConfig {
-        applicationId "com.budgettracker_fresh"
+        applicationId "com.cwbudgettracker"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -116,4 +116,12 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+    // Firebase BoM to align Firebase library versions
+    implementation platform("com.google.firebase:firebase-bom:32.7.4")
 }
+
+// Apply the Google Services plugin for Firebase
+apply plugin: "com.google.gms.google-services"
+
+// Ensure vector icon fonts are bundled into the app
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"

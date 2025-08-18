@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "434356332670",
+    "project_id": "cw-budgettracker",
+    "storage_bucket": "cw-budgettracker.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:434356332670:android:52cf4d82b999569a04502f",
+        "android_client_info": {
+          "package_name": "com.cwbudgettracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_clR6yC92-ATIs65rm3vN8iM6m5g9Dm0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

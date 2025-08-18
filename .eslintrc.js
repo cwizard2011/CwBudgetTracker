@@ -1,4 +1,6 @@
 module.exports = {
+  parser: '@babel/eslint-parser',
+  parserOptions: { requireConfigFile: false },
   root: true,
-  extends: '@react-native',
+  extends: ['eslint:recommended', 'plugin:react/recommended'],
 };

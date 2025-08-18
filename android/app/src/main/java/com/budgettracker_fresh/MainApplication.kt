@@ -1,4 +1,4 @@
-package com.budgettracker_fresh
+package com.cwbudgettracker
 
 import android.app.Application
 import com.facebook.react.PackageList
