@@ -1,74 +1,84 @@
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { default as React } from 'react';
+import { StyleSheet as RNStyleSheet, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { NavigationCard } from '../components/ui/NavigationCard';
+import { useSettings } from '../context/SettingsContext';
 import { Colors } from '../theme/colors';
+import { useI18n } from '../utils/i18n';
 
 export function HomeScreen({ navigation }: any) {
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.heading}>Welcome</Text>
+  // Subscribe to settings so theme changes trigger a re-render
+  const { theme } = useSettings();
+  const t = useI18n();
+  const GAP = 6;
+  const V_PADDING = 12;
+  const { height: windowHeight } = useWindowDimensions();
+  const [containerHeight, setContainerHeight] = React.useState<number | null>(null);
+  const [footerHeight, setFooterHeight] = React.useState<number>(0);
+  const FOOTER_BOTTOM_MARGIN = 6;
+  const year = new Date().getFullYear();
 
+  const availableHeight = Math.max(
+    0,
+    (containerHeight ?? windowHeight) - V_PADDING * 2 - footerHeight - GAP - FOOTER_BOTTOM_MARGIN,
+  );
+  const cardHeight = Math.max(0, (availableHeight - GAP * 4) / 5);
+
+  const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: Colors.background, padding: 12 },
+    heading: { display: 'none' as any },
+    grid: { flex: 1 },
+    gridItem: { width: '100%' } as any,
+    footer: { alignItems: 'center', justifyContent: 'center', marginTop: GAP, marginBottom: FOOTER_BOTTOM_MARGIN },
+    footerText: { color: Colors.mutedText, fontSize: 12, textAlign: 'center' },
+  });
+
+  return (
+    <View style={styles.container} onLayout={(e) => setContainerHeight(e.nativeEvent.layout.height)}>
+      <Text style={styles.heading}>{t('home.welcome')}</Text>
       <View style={styles.grid}>
         <NavigationCard
-          title="Budget"
+          title={t('home.budget')}
           color={Colors.primary}
           icon="💰"
           onPress={() => navigation.navigate('Sections', { initial: 'Budget' })}
-          style={styles.gridItem}
+          style={RNStyleSheet.flatten([styles.gridItem, { height: cardHeight, minHeight: cardHeight, marginBottom: GAP }])}
         />
         <NavigationCard
-          title="Loans"
+          title={t('home.loans')}
           color={Colors.secondary}
           icon="🤝"
           onPress={() => navigation.navigate('Sections', { initial: 'Loans' })}
-          style={styles.gridItem}
+          style={RNStyleSheet.flatten([styles.gridItem, { height: cardHeight, minHeight: cardHeight, marginBottom: GAP }])}
         />
         <NavigationCard
-          title="Loan payment history"
+          title={t('home.loanHistory')}
           color={Colors.success}
           icon="📑"
-          onPress={() => navigation.navigate('Sections', { initial: 'LoanHistory' })}
-          style={styles.gridItem}
+          onPress={() => navigation.navigate('LoanHistory')}
+          style={RNStyleSheet.flatten([styles.gridItem, { height: cardHeight, minHeight: cardHeight, marginBottom: GAP }])}
         />
         <NavigationCard
-          title="Budget history"
+          title={t('home.budgetHistory')}
           color={Colors.warning}
           icon="📈"
-          onPress={() => navigation.navigate('Sections', { initial: 'BudgetHistory' })}
-          style={styles.gridItem}
+          onPress={() => navigation.navigate('BudgetHistory')}
+          style={RNStyleSheet.flatten([styles.gridItem, { height: cardHeight, minHeight: cardHeight, marginBottom: GAP }])}
         />
         <NavigationCard
-          title="Settings"
+          title={t('home.settings')}
           color={Colors.error}
           icon="⚙️"
           onPress={() => navigation.navigate('Sections', { initial: 'Settings' })}
-          style={styles.gridItem}
+          style={RNStyleSheet.flatten([styles.gridItem, { height: cardHeight, minHeight: cardHeight, marginBottom: 0 }])}
         />
       </View>
-    </ScrollView>
+      <View style={styles.footer} onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}>
+        <Text style={styles.footerText}>
+          {t('home.footerDevelopedBy')} Peter Adeoye (cwizard) © {year}
+        </Text>
+      </View>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  content: { padding: 16 },
-  heading: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: Colors.text,
-    marginBottom: 12,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 4,
-    marginHorizontal: -8,
-  },
-  gridItem: {
-    width: '49%',
-    paddingHorizontal: 8,
-    marginBottom: 16,
-  } as any,
-});
 
 

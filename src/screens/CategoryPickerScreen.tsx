@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   catRow: { paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: Colors.border },
   iconGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 },
   iconBox: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 8, borderWidth: 1, borderColor: Colors.border, marginRight: 8, marginBottom: 8 },
-  iconActive: { backgroundColor: '#F3F4F6' },
+  iconActive: { backgroundColor: Colors.surface, borderColor: Colors.primary },
 });
 
 

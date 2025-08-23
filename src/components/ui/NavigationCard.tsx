@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
 import { Colors } from '../../theme/colors';
 
 export interface NavigationCardProps {
@@ -7,7 +7,7 @@ export interface NavigationCardProps {
   color?: string;
   icon?: string; // e.g. emoji or glyph
   onPress: () => void;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
 export function NavigationCard({ title, color = Colors.primary, icon = '📄', onPress, style }: NavigationCardProps) {
@@ -28,19 +28,20 @@ export function NavigationCard({ title, color = Colors.primary, icon = '📄', o
 const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
-    paddingVertical: 20,
-    paddingHorizontal: 12,
+    paddingVertical: 32,
+    paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 120,
+    minHeight: 220,
   },
   icon: {
-    fontSize: 40,
-    marginBottom: 8,
+    fontSize: 72,
+    marginBottom: 12,
   },
   title: {
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: '800',
+    textAlign: 'center',
   },
 });
 

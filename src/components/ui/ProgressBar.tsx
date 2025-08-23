@@ -14,7 +14,7 @@ export interface ProgressBarProps {
 export function ProgressBar({ progress, trackColor = Colors.progressBackground, fillColor = Colors.primary, style, height = 6, rounded = true }: ProgressBarProps) {
   const clamped = Math.max(0, Math.min(1, progress || 0));
   return (
-    <View style={[styles.track, { backgroundColor: trackColor, height, borderRadius: rounded ? height / 2 : 0 }, style]}>
+    <View style={[styles.track, { backgroundColor: trackColor, height, borderRadius: rounded ? height / 2 : 0, borderColor: Colors.border, borderWidth: StyleSheet.hairlineWidth }, style]}>
       <View style={[styles.fill, { width: `${clamped * 100}%`, backgroundColor: fillColor, height }]} />
     </View>
   );

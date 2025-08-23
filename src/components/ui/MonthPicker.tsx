@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useSettings } from '../../context/SettingsContext';
 import { Colors } from '../../theme/colors';
 import { Button } from './Button';
 
@@ -21,23 +22,24 @@ function compareYM(a: string, b: string): number {
   return a.localeCompare(b);
 }
 
-function toLongMonth(ym: string): string {
+function toLongMonth(ym: string, locale?: string): string {
   const [y, m] = ym.split('-').map(n => parseInt(n, 10));
-  return new Date(y, m - 1, 1).toLocaleString(undefined, { month: 'long', year: 'numeric' });
+  return new Date(y, m - 1, 1).toLocaleString(locale || undefined, { month: 'long', year: 'numeric' });
 }
 
-function shortMonth(ym: string): string {
+function shortMonth(ym: string, locale?: string): string {
   const [y, m] = ym.split('-').map(n => parseInt(n, 10));
-  return new Date(y, m - 1, 1).toLocaleString(undefined, { month: 'short' });
+  return new Date(y, m - 1, 1).toLocaleString(locale || undefined, { month: 'short' });
 }
 
-function centerLabel(ym: string): string {
+function centerLabel(ym: string, locale?: string): string {
   const [y, m] = ym.split('-').map(n => parseInt(n, 10));
-  const mon = new Date(y, m - 1, 1).toLocaleString(undefined, { month: 'short' });
+  const mon = new Date(y, m - 1, 1).toLocaleString(locale || undefined, { month: 'short' });
   return `${mon},${y}`;
 }
 
 export function MonthPicker({ yearMonth, onChange, minYearMonth }: MonthPickerProps) {
+  const { locale } = useSettings();
   const prev = addMonths(yearMonth, -1);
   const next = addMonths(yearMonth, 1);
   const minBlocked = !!minYearMonth && compareYM(prev, minYearMonth) < 0;
@@ -46,7 +48,7 @@ export function MonthPicker({ yearMonth, onChange, minYearMonth }: MonthPickerPr
       <View style={styles.side}>
         <Button
           textStyle={styles.buttonText}
-          title={shortMonth(prev)}
+          title={shortMonth(prev, locale)}
           onPress={() => !minBlocked && onChange(prev)}
           variant="neutral"
           small
@@ -58,11 +60,11 @@ export function MonthPicker({ yearMonth, onChange, minYearMonth }: MonthPickerPr
           iconColor={styles.buttonText.color as string}
         />
       </View>
-      <View style={styles.center}><Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">{centerLabel(yearMonth)}</Text></View>
+      <View style={styles.center}><Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">{centerLabel(yearMonth, locale)}</Text></View>
       <View style={styles.side}>
         <Button
           textStyle={styles.buttonText}
-          title={shortMonth(next)}
+          title={shortMonth(next, locale)}
           onPress={() => onChange(next)}
           variant="neutral"
           small
@@ -82,7 +84,7 @@ const styles = StyleSheet.create({
   side: { flexBasis: '30%', maxWidth: '30%'},
   center: { flexBasis: '40%', maxWidth: '40%', alignItems: 'center' },
   label: { fontWeight: '700', color: Colors.text },
-  button: { width: '100%', backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
+  button: { width: '100%', backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
   buttonText: { color: Colors.mutedText }
 });
 

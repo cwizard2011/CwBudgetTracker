@@ -12,18 +12,20 @@ export interface PromptModalProps {
   confirmText?: string;
   cancelText?: string;
   showConfirm?: boolean;
+  cancelVariant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'neutral';
+  confirmVariant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'neutral';
 }
 
-export function PromptModal({ visible, title, children, onCancel, onConfirm, confirmText = 'Save', cancelText = 'Cancel', showConfirm = true }: PromptModalProps) {
+export function PromptModal({ visible, title, children, onCancel, onConfirm, confirmText = 'Save', cancelText = 'Cancel', showConfirm = true, cancelVariant = 'neutral', confirmVariant = 'primary' }: PromptModalProps) {
   return (
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.backdrop}>
-        <View style={styles.card}>
-          <Text style={styles.title}>{title}</Text>
+        <View style={[styles.card, { backgroundColor: Colors.surface }]}>
+          <Text style={[styles.title, { color: Colors.text }]}>{title}</Text>
           <View style={{ width: '100%' }}>{children}</View>
           <View style={styles.actions}>
-            <Button title={cancelText} onPress={onCancel} variant="neutral" />
-            {showConfirm && onConfirm && <Button title={confirmText} onPress={onConfirm} variant="primary" />}
+            <Button title={cancelText} onPress={onCancel} variant={cancelVariant} />
+            {showConfirm && onConfirm && <Button title={confirmText} onPress={onConfirm} variant={confirmVariant} />}
           </View>
         </View>
       </View>
@@ -39,7 +41,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   card: {
-    backgroundColor: Colors.surface,
     padding: 20,
     borderRadius: 12,
     width: '86%',
@@ -47,7 +48,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: Colors.text,
     marginBottom: 12,
   },
   actions: {

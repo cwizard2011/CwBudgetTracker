@@ -12,15 +12,15 @@ interface SectionHeaderProps {
 
 export function SectionHeader({ title, displayTitle, collapsed, onToggle }: SectionHeaderProps) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: Colors.surface, borderColor: Colors.border, borderWidth: StyleSheet.hairlineWidth }] }>
       <TouchableOpacity onPress={onToggle} accessibilityRole="button" accessibilityLabel={`Toggle ${displayTitle}`} style={styles.row}>
-        <Text style={styles.title}>{displayTitle}</Text>
+        <Text style={[styles.title, { color: Colors.text }]}>{displayTitle}</Text>
         <IconButton
           family="MaterialIcons"
           name={collapsed ? 'keyboard-arrow-down' : 'keyboard-arrow-up'}
           onPress={onToggle}
           size={28}
-          color={Colors.white}
+          color={Colors.text}
         />
       </TouchableOpacity>
     </View>
@@ -33,10 +33,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginTop: 16,
     borderRadius: 8,
-    backgroundColor: Colors.primaryDark,
+    backgroundColor: Colors.surface,
   },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontWeight: '800', color: Colors.white, fontSize: 16 },
+  title: { fontWeight: '800', color: Colors.text, fontSize: 16 },
 });
 
 

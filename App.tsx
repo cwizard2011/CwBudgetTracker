@@ -13,16 +13,21 @@ import { StatusBar, useColorScheme } from 'react-native';
 import { BudgetProvider } from './src/context/BudgetContext';
 import { CategoryProvider } from './src/context/CategoryContext';
 import { LoanProvider } from './src/context/LoanContext';
-import { BudgetDetailsScreen, BudgetScreen, CategoryPickerScreen, HomeScreen, LoanScreen, RecurringPickerScreen, SectionsScreen } from './src/screens';
+import { SettingsProvider, useSettings } from './src/context/SettingsContext';
+import { BudgetDetailsScreen, BudgetHistoryScreen, BudgetScreen, CategoryPickerScreen, HomeScreen, LoanHistoryScreen, LoanInvoiceScreen, LoanScreen, LodgeLoanScreen, RecurringPickerScreen, SectionsScreen } from './src/screens';
 import { syncService } from './src/services/SyncService';
+import { applyTheme } from './src/theme/colors';
 import { navigationRef } from './src/utils/navigationRef';
 
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-export default function App() {
+function InnerApp() {
   const isDarkMode = useColorScheme() === 'dark';
+  const { theme } = useSettings();
+  const resolved = theme === 'system' ? (isDarkMode ? true : false) : theme === 'dark' ? true : (theme as any);
+  applyTheme(resolved as any);
 
   useEffect(() => {
     syncService.start();
@@ -34,13 +39,17 @@ export default function App() {
       <BudgetProvider>
       <CategoryProvider>
       <NavigationContainer ref={navigationRef}>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        <StatusBar barStyle={(resolved === true) ? 'light-content' : 'dark-content'} />
         <Stack.Navigator>
           <Stack.Screen name="Home" component={HomeScreen} options={{ title: '' }} />
           <Stack.Screen name="Sections" component={SectionsScreen} options={{ title: 'Sections' }} />
-          <Stack.Screen name="BudgetDetails" component={BudgetDetailsScreen} options={{ title: 'New Budget' }} />
+          <Stack.Screen name="BudgetDetails" component={BudgetDetailsScreen} options={{ title: '' }} />
           <Stack.Screen name="CategoryPicker" component={CategoryPickerScreen} options={{ title: 'Category' }} />
           <Stack.Screen name="RecurringPicker" component={RecurringPickerScreen} options={{ title: 'Recurring' }} />
+          <Stack.Screen name="LodgeLoan" component={LodgeLoanScreen} options={{ title: 'Lodge Loan' }} />
+          <Stack.Screen name="LoanInvoice" component={LoanInvoiceScreen} options={{ title: 'Invoice' }} />
+          <Stack.Screen name="BudgetHistory" component={BudgetHistoryScreen} options={{ title: 'Budget History' }} />
+          <Stack.Screen name="LoanHistory" component={LoanHistoryScreen} options={{ title: 'Loan History' }} />
           {/* Keep legacy tabs as a separate screen if desired */}
           <Stack.Screen name="Tabs" options={{ headerShown: false }}>
             {() => (
@@ -55,6 +64,14 @@ export default function App() {
       </CategoryProvider>
     </BudgetProvider>
     </LoanProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <SettingsProvider>
+      <InnerApp />
+    </SettingsProvider>
   );
 }
 

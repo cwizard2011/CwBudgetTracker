@@ -7,10 +7,12 @@ import { PromptModal } from '../components/ui/PromptModal';
 import { useBudgets } from '../context/BudgetContext';
 import { useCategories } from '../context/CategoryContext';
 import { Colors } from '../theme/colors';
+import { useI18n } from '../utils/i18n';
 
 export function BudgetDetailsScreen({ navigation, route }: any) {
   const { addBudget, updateBudget, updateBudgetSingle, updateBudgetSeries, updateBudgetFuture } = useBudgets() as any;
   const { categories, addCategory } = useCategories();
+  const t = useI18n();
 
   const editing = route?.params?.budget || null;
   const [title, setTitle] = useState(editing?.title ?? '');
@@ -39,8 +41,11 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
     if (!title || !amount) return;
     const currentYM = new Date().toISOString().slice(0, 7);
     const today = new Date().toISOString().slice(0,10);
-    if (period < currentYM) return;
-    if (dateISO < today) return;
+    // Only block past dates for new budgets; allow edits to past records
+    if (!editing) {
+      if (period < currentYM) return;
+      if (dateISO < today) return;
+    }
     const resolvedStop = recurring === 'none' ? undefined : recurringStopISO;
     const anchor = dateISO; // align anchor with chosen specific date
     if (editing) {
@@ -54,7 +59,11 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
       }
       await updateBudget(editing.id, updates);
     } else {
-      await addBudget({ title, amountPlanned: parseFloat(amount), period, category, categoryIcon, recurring, anchorDateISO: anchor, dateISO, notes, recurringStopISO: resolvedStop });
+      const chosenCategory = (category && category.trim()) ? category : 'General';
+      if (chosenCategory === 'General' && !categories.includes('General')) {
+        await addCategory('General');
+      }
+      await addBudget({ title, amountPlanned: parseFloat(amount), period, category: chosenCategory, categoryIcon, recurring, anchorDateISO: anchor, dateISO, notes, recurringStopISO: resolvedStop });
     }
     navigation.goBack();
   };
@@ -89,14 +98,21 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
     setNewCategory('');
   };
 
+  const stylesDyn = StyleSheet.create({
+    container: { flex: 1, backgroundColor: Colors.background },
+    heading: { fontSize: 20, fontWeight: '800', color: Colors.text, marginBottom: 12 },
+    label: { color: Colors.mutedText, marginBottom: 6 },
+    pickerLike: { borderWidth: 1, borderColor: Colors.border, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: Colors.surface },
+  });
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: 16 }}>
-      <Text style={styles.heading}>{editing ? 'Edit Budget' : 'New Budget'}</Text>
-      <Input placeholder="Title" value={title} onChangeText={setTitle} style={{ marginBottom: 12 }} />
-      <Input placeholder="Amount" value={amount} onChangeText={setAmount} keyboardType="numeric" style={{ marginBottom: 12 }} />
+    <ScrollView style={stylesDyn.container} contentContainerStyle={{ padding: 16 }}>
+      <Text style={stylesDyn.heading}>{editing ? t('budget.edit') : t('budget.new')}</Text>
+      <Input placeholder={t('common.title')} value={title} onChangeText={setTitle} style={{ marginBottom: 12 }} />
+      <Input placeholder={t('budget.amount')} value={amount} onChangeText={setAmount} keyboardType="numeric" style={{ marginBottom: 12 }} />
       <View style={{ marginBottom: 12 }}>
-        <Text style={styles.label}>Date</Text>
-        <TouchableOpacity style={styles.pickerLike} onPress={() => setShowDatePicker(true)} activeOpacity={0.7}>
+        <Text style={stylesDyn.label}>{t('budget.date')}</Text>
+        <TouchableOpacity style={stylesDyn.pickerLike} onPress={() => setShowDatePicker(true)} activeOpacity={0.7}>
           <Text style={{ color: Colors.text }}>{dateISO}</Text>
         </TouchableOpacity>
         {showDatePicker && (
@@ -121,28 +137,28 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
         )}
       </View>
       <View style={{ marginBottom: 12 }}>
-        <Text style={styles.label}>Category</Text>
+        <Text style={stylesDyn.label}>{t('budget.category')}</Text>
         <TouchableOpacity
           onPress={() => navigation.navigate('CategoryPicker', { value: category, icon: categoryIcon, onSelect: (v: string, i: string) => { setCategory(v); setCategoryIcon(i); navigation.goBack(); } })}
-          style={styles.pickerLike}
+          style={stylesDyn.pickerLike}
           activeOpacity={0.7}
         >
-          <Text style={{ color: category ? Colors.text : Colors.mutedText }}>{categoryIcon ? `${categoryIcon} ` : ''}{category || 'Select category'}</Text>
+          <Text style={{ color: category ? Colors.text : Colors.mutedText }}>{categoryIcon ? `${categoryIcon} ` : ''}{category || t('budget.selectCategory')}</Text>
         </TouchableOpacity>
       </View>
       <View style={{ marginBottom: 12 }}>
-        <Text style={styles.label}>Recurring</Text>
+        <Text style={stylesDyn.label}>{t('budget.recurring')}</Text>
         <Button
-          title={`Recurring: ${recurring === 'none' ? 'None' : recurring[0].toUpperCase() + recurring.slice(1)}`}
+          title={`${t('budget.recurring')}: ${recurring === 'none' ? t('common.none') : (recurring === 'weekly' ? t('period.weekly') : recurring === 'monthly' ? t('period.monthly') : recurring === 'quarterly' ? t('period.quarterly') : t('period.annual'))}`}
           onPress={() => navigation.navigate('RecurringPicker', { value: recurring, onSelect: (v: any) => { setRecurring(v); navigation.goBack(); } })}
           variant="neutral"
         />
       </View>
       {recurring !== 'none' && (
         <View style={{ marginBottom: 12 }}>
-          <Text style={styles.label}>Recurring End Date (inclusive)</Text>
-          <TouchableOpacity style={styles.pickerLike} onPress={() => setShowStopPicker(true)} activeOpacity={0.7}>
-            <Text style={{ color: recurringStopISO ? Colors.text : Colors.mutedText }}>{recurringStopISO || 'Select recurring end date'}</Text>
+          <Text style={stylesDyn.label}>{t('budget.recurringEnd')}</Text>
+          <TouchableOpacity style={stylesDyn.pickerLike} onPress={() => setShowStopPicker(true)} activeOpacity={0.7}>
+            <Text style={{ color: recurringStopISO ? Colors.text : Colors.mutedText }}>{recurringStopISO || t('budget.selectRecurringEnd')}</Text>
           </TouchableOpacity>
           {showStopPicker && (
             <DateTimePicker
@@ -163,14 +179,14 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
           )}
         </View>
       )}
-      <Input placeholder="Notes" value={notes} onChangeText={setNotes} style={{ marginBottom: 16 }} />
-      <Button title="Save" onPress={handleSave} variant="primary" />
+      <Input placeholder={t('common.notes')} value={notes} onChangeText={setNotes} style={{ marginBottom: 16 }} />
+      <Button title={t('common.save')} onPress={handleSave} variant="primary" />
 
-      <PromptModal visible={scopeModalVisible} title="Apply changes to" onCancel={() => setScopeModalVisible(false)} showConfirm={false} cancelText="Close">
+      <PromptModal visible={scopeModalVisible} title={t('budget.applyChangesTo')} onCancel={() => setScopeModalVisible(false)} showConfirm={false} cancelText={t('common.close')}>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-          <Button title="This Occurrence" variant="primary" onPress={applySingle} style={{ marginRight: 8, marginBottom: 8 }} />
-          <Button title="All Recurring" variant="secondary" onPress={applySeries} style={{ marginRight: 8, marginBottom: 8 }} />
-          <Button title="Future Recurring" variant="neutral" onPress={applyFuture} />
+          <Button title={t('budget.thisOccurrence')} variant="primary" onPress={applySingle} style={{ marginRight: 8, marginBottom: 8 }} />
+          <Button title={t('budget.allRecurring')} variant="secondary" onPress={applySeries} style={{ marginRight: 8, marginBottom: 8 }} />
+          <Button title={t('budget.futureRecurring')} variant="neutral" onPress={applyFuture} />
         </View>
       </PromptModal>
     </ScrollView>

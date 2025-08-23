@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Colors } from '../theme/colors';
 import { BudgetScreen } from './Budget/BudgetScreen';
 import { LoanScreen } from './LoanScreen';
+import { SettingsScreen } from './SettingsScreen';
 
 type SectionKey = 'Budget' | 'Loans' | 'LoanHistory' | 'BudgetHistory' | 'Settings';
 
@@ -44,9 +45,16 @@ export function SectionsScreen({ route, navigation }: any) {
     navigation?.setOptions?.({ title: titleFor(active) });
   }, [active, navigation]);
 
+  const stylesDyn = StyleSheet.create({
+    container: { flex: 1, backgroundColor: Colors.background },
+    content: { flex: 1, paddingHorizontal: 12 },
+    placeholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    placeholderText: { color: Colors.mutedText },
+  });
+
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
+    <View style={stylesDyn.container}>
+      <View style={stylesDyn.content}>
         {active === 'Budget' && <BudgetScreen />}
         {active === 'Loans' && <LoanScreen />}
         {active === 'LoanHistory' && (
@@ -55,7 +63,7 @@ export function SectionsScreen({ route, navigation }: any) {
         {active === 'BudgetHistory' && (
           <Placeholder title="Budget history" />
         )}
-        {active === 'Settings' && <Placeholder title="Settings" />}
+        {active === 'Settings' && <SettingsScreen />}
       </View>
     </View>
   );
@@ -64,7 +72,7 @@ export function SectionsScreen({ route, navigation }: any) {
 function Placeholder({ title }: { title: string }) {
   return (
     <View style={styles.placeholder}> 
-      <Text style={styles.placeholderText}>{title} (to be defined)</Text>
+      <Text style={styles.placeholderText}>{title} - Development in Progress</Text>
     </View>
   );
 }
