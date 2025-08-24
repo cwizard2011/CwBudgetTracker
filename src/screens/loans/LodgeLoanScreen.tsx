@@ -173,7 +173,7 @@ export function LodgeLoanScreen({ navigation, route }: any) {
 
       <View style={{ marginBottom: 12 }}>
         <Text style={styles.label}>{t('loans.date')}</Text>
-        <TouchableOpacity style={styles.pickerLike} onPress={() => setShowDatePicker(true)} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.pickerLike} onPress={() => setShowDatePicker(s => !s)} activeOpacity={0.7}>
           <Text style={{ color: Colors.text }}>{dateISO}</Text>
         </TouchableOpacity>
         {showDatePicker && (
@@ -186,7 +186,7 @@ export function LodgeLoanScreen({ navigation, route }: any) {
             {...(Platform.OS === 'ios' ? { textColor: Colors.text as any } : {})}
             maximumDate={new Date()}
             onChange={(event: any, selected?: Date) => {
-              setShowDatePicker(false);
+              if (Platform.OS !== 'ios') setShowDatePicker(false);
               if (selected) {
                 const y = selected.getFullYear();
                 const m = String(selected.getMonth() + 1).padStart(2,'0');

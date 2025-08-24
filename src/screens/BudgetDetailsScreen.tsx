@@ -2,6 +2,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useMemo, useState } from 'react';
 import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Button } from '../components/ui/Button';
+import { CalculatorModal } from '../components/ui/CalculatorModal';
 import { Input } from '../components/ui/Input';
 import { PromptModal } from '../components/ui/PromptModal';
 import { useBudgets } from '../context/BudgetContext';
@@ -18,6 +19,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
   const editing = route?.params?.budget || null;
   const [title, setTitle] = useState(editing?.title ?? '');
   const [amount, setAmount] = useState(editing ? String(editing.amountPlanned) : '');
+  const [showCalc, setShowCalc] = useState(false);
   const [period, setPeriod] = useState(editing?.period ?? new Date().toISOString().slice(0, 7));
   const [notes, setNotes] = useState(editing?.notes ?? '');
   const [dateISO, setDateISO] = useState<string>(editing?.dateISO ?? new Date().toISOString().slice(0,10));
@@ -121,10 +123,12 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
     <ScrollView style={stylesDyn.container} contentContainerStyle={{ padding: 16 }}>
       <Text style={stylesDyn.heading}>{editing ? t('budget.edit') : t('budget.new')}</Text>
       <Input placeholder={t('common.title')} value={title} onChangeText={setTitle} style={{ marginBottom: 12 }} />
-      <Input placeholder={t('budget.amount')} value={amount} onChangeText={setAmount} keyboardType="numeric" style={{ marginBottom: 12 }} />
+      <TouchableOpacity activeOpacity={0.7} onPress={() => setShowCalc(true)}>
+        <Input placeholder={t('budget.amount')} value={amount} editable={false} pointerEvents="none" keyboardType="numeric" style={{ marginBottom: 12 }} />
+      </TouchableOpacity>
       <View style={{ marginBottom: 12 }}>
         <Text style={stylesDyn.label}>{t('budget.date')}</Text>
-        <TouchableOpacity style={stylesDyn.pickerLike} onPress={() => setShowDatePicker(true)} activeOpacity={0.7}>
+        <TouchableOpacity style={stylesDyn.pickerLike} onPress={() => setShowDatePicker(s => !s)} activeOpacity={0.7}>
           <Text style={{ color: Colors.text }}>{dateISO}</Text>
         </TouchableOpacity>
         {showDatePicker && (
@@ -137,8 +141,8 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
             themeVariant={isDarkBg ? 'dark' : 'light'}
             {...(Platform.OS === 'ios' ? { textColor: Colors.text as any } : {})}
             onChange={(event: any, selected?: Date) => {
-              // Hide immediately for both platforms
-              setShowDatePicker(false);
+              // Only auto-hide on Android; keep open on iOS until user toggles
+              if (Platform.OS !== 'ios') setShowDatePicker(false);
               if (selected) {
                 const y = selected.getFullYear();
                 const m = String(selected.getMonth() + 1).padStart(2,'0');
@@ -172,7 +176,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
       {recurring !== 'none' && (
         <View style={{ marginBottom: 12 }}>
           <Text style={stylesDyn.label}>{t('budget.recurringEnd')}</Text>
-          <TouchableOpacity style={stylesDyn.pickerLike} onPress={() => setShowStopPicker(true)} activeOpacity={0.7}>
+          <TouchableOpacity style={stylesDyn.pickerLike} onPress={() => setShowStopPicker(s => !s)} activeOpacity={0.7}>
             <Text style={{ color: recurringStopISO ? Colors.text : Colors.mutedText }}>{recurringStopISO || t('budget.selectRecurringEnd')}</Text>
           </TouchableOpacity>
           {showStopPicker && (
@@ -185,7 +189,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
               themeVariant={isDarkBg ? 'dark' : 'light'}
               {...(Platform.OS === 'ios' ? { textColor: Colors.text as any } : {})}
               onChange={(event: any, selected?: Date) => {
-                setShowStopPicker(false);
+                if (Platform.OS !== 'ios') setShowStopPicker(false);
                 if (selected) {
                   const y = selected.getFullYear();
                   const m = String(selected.getMonth() + 1).padStart(2,'0');
@@ -208,6 +212,13 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
       />
       <Text style={{ color: Colors.mutedText, marginBottom: 16, textAlign: 'right' }}>{`${notes.length}/500`}</Text>
       <Button title={t('common.save')} onPress={handleSave} variant="primary" />
+
+      <CalculatorModal
+        visible={showCalc}
+        initialValue={amount}
+        onClose={() => setShowCalc(false)}
+        onSubmit={(val) => { setAmount(String(val)); setShowCalc(false); }}
+      />
 
       <PromptModal visible={scopeModalVisible} title={t('budget.applyChangesTo')} onCancel={() => setScopeModalVisible(false)} showConfirm={false} cancelText={t('common.close')}>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
