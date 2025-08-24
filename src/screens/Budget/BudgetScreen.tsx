@@ -99,6 +99,12 @@ export function BudgetScreen() {
     return Array.from(byCat.entries()).map(([k, v]) => ({ k, ...v }));
   }, [filtered]);
 
+  const monthTotals = useMemo(() => {
+    const planned = filtered.reduce((s: number, b: any) => s + (b.amountPlanned || 0), 0);
+    const spent = filtered.reduce((s: number, b: any) => s + (b.amountSpent || 0), 0);
+    return { planned, spent };
+  }, [filtered]);
+
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
       <TopActions
@@ -116,12 +122,14 @@ export function BudgetScreen() {
 
       <View style={[styles.rowWrap, { marginTop: 12 }]}> 
         <Text style={{ fontWeight: '700', color: Colors.text }}>{t('budget.summaries')}</Text>
-        {summaries.map(s => (
-          <View key={s.k} style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-            <Text style={{ color: Colors.text }}>{s.k}</Text>
-            <Text style={{ color: Colors.mutedText }}>{formatCurrency(s.spent, locale, currency)} / {formatCurrency(s.planned, locale, currency)}</Text>
-          </View>
-        ))}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+          <Text style={{ color: Colors.text }}>{t('budget.plannedTotal')}</Text>
+          <Text style={{ color: Colors.text }}>{formatCurrency(monthTotals.planned, locale, currency)}</Text>
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+          <Text style={{ color: Colors.text }}>{t('budget.spentTotal')}</Text>
+          <Text style={{ color: Colors.text }}>{formatCurrency(monthTotals.spent, locale, currency)}</Text>
+        </View>
         {(() => {
           const totalExcess = filtered.reduce((sum: number, b: any) => {
             const over = (b.amountSpent || 0) - (b.amountPlanned || 0);

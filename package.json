@@ -5,6 +5,15 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
+    "android:install": "adb install -r ./android/app/build/outputs/apk/release/app-release.apk",
+    "android:update": "cd android && ./gradlew assembleDebug && adb install -r ./app/build/outputs/apk/debug/app-debug.apk",
+    "android:update:release": "cd android && ./gradlew assembleRelease && adb install -r ./app/build/outputs/apk/release/app-release.apk",
+    "ios:device:build": "cd ios && xcodebuild -workspace CwBudgetTracker.xcworkspace -scheme CwBudgetTracker -configuration Debug -destination 'id=$DEVICE_ID' -allowProvisioningUpdates -derivedDataPath /tmp/CwBTBuild build",
+    "ios:device:install": "xcrun devicectl device install app --device $DEVICE_ID /tmp/CwBTBuild/Build/Products/Debug-iphoneos/CwBudgetTracker.app",
+    "ios:device:update": "npm run ios:device:build && npm run ios:device:install",
+    "ios:device:build:release": "cd ios && xcodebuild -workspace CwBudgetTracker.xcworkspace -scheme CwBudgetTracker -configuration Release -destination 'id=$DEVICE_ID' -allowProvisioningUpdates -derivedDataPath /tmp/CwBTBuildRelease build",
+    "ios:device:install:release": "xcrun devicectl device install app --device $DEVICE_ID /tmp/CwBTBuildRelease/Build/Products/Release-iphoneos/CwBudgetTracker.app",
+    "ios:device:update:release": "npm run ios:device:build:release && npm run ios:device:install:release",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"
