@@ -30,8 +30,19 @@ const variantToColor: Record<ButtonVariant, string> = {
   neutral: '#9CA3AF',
 };
 
+const variantToOnColor: Record<ButtonVariant, string> = {
+  primary: Colors.onPrimary,
+  secondary: Colors.onSecondary,
+  success: Colors.onSuccess,
+  warning: Colors.onWarning,
+  danger: Colors.onError,
+  neutral: Colors.text,
+};
+
 export function Button({ title, onPress, variant = 'primary', style, textStyle, disabled, small, iconName, iconPosition = 'left', iconFamily = 'MaterialIcons', iconSize = 16, iconColor }: ButtonProps) {
   const backgroundColor = variantToColor[variant];
+  const defaultTextColor = variantToOnColor[variant];
+  const resolvedTextColor = (textStyle && (textStyle as any).color) ? (textStyle as any).color : defaultTextColor;
   const IconComponent = iconFamily === 'MaterialCommunityIcons' ? MaterialCommunityIcons : MaterialIcons;
   return (
     <TouchableOpacity
@@ -41,11 +52,11 @@ export function Button({ title, onPress, variant = 'primary', style, textStyle, 
     >
       <View style={styles.contentRow}>
         {iconName && iconPosition === 'left' ? (
-          <IconComponent name={iconName} size={iconSize} color={iconColor || (textStyle && 'color' in textStyle ? (textStyle as any).color : styles.text.color)} style={styles.iconLeft} />
+          <IconComponent name={iconName} size={iconSize} color={iconColor || resolvedTextColor} style={styles.iconLeft} />
         ) : null}
-        <Text style={[styles.text, textStyle]}>{title}</Text>
+        <Text style={[styles.text, { color: resolvedTextColor }, textStyle]}>{title}</Text>
         {iconName && iconPosition === 'right' ? (
-          <IconComponent name={iconName} size={iconSize} color={iconColor || (textStyle && 'color' in textStyle ? (textStyle as any).color : styles.text.color)} style={styles.iconRight} />
+          <IconComponent name={iconName} size={iconSize} color={iconColor || resolvedTextColor} style={styles.iconRight} />
         ) : null}
       </View>
     </TouchableOpacity>

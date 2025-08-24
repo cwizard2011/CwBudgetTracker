@@ -14,7 +14,7 @@ export function SectionHeader({ title, displayTitle, collapsed, onToggle }: Sect
   return (
     <View style={[styles.container, { backgroundColor: Colors.surface, borderColor: Colors.border, borderWidth: StyleSheet.hairlineWidth }] }>
       <TouchableOpacity onPress={onToggle} accessibilityRole="button" accessibilityLabel={`Toggle ${displayTitle}`} style={styles.row}>
-        <Text style={[styles.title, { color: Colors.text }]}>{displayTitle}</Text>
+        <Text style={[styles.title, { color: Colors.text }]} numberOfLines={1} ellipsizeMode="tail">{displayTitle}</Text>
         <IconButton
           family="MaterialIcons"
           name={collapsed ? 'keyboard-arrow-down' : 'keyboard-arrow-up'}

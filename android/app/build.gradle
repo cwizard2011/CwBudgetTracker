@@ -1,6 +1,9 @@
-apply plugin: "com.android.application"
-apply plugin: "org.jetbrains.kotlin.android"
-apply plugin: "com.facebook.react"
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    id "com.facebook.react"
+    id "com.google.gms.google-services"
+}
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -72,6 +75,20 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+// Helper to resolve signing values from environment variables first, then project properties
+def envOrProp = { String envKey, String propKey ->
+    def v = System.getenv(envKey)
+    if (v == null || v.toString().trim().isEmpty()) {
+        return project.hasProperty(propKey) ? project.getProperty(propKey) : null
+    }
+    return v
+}
+
+def RELEASE_STORE_FILE = envOrProp('MYAPP_UPLOAD_STORE_FILE', 'MYAPP_UPLOAD_STORE_FILE')
+def RELEASE_STORE_PASSWORD = envOrProp('MYAPP_UPLOAD_STORE_PASSWORD', 'MYAPP_UPLOAD_STORE_PASSWORD')
+def RELEASE_KEY_ALIAS = envOrProp('MYAPP_UPLOAD_KEY_ALIAS', 'MYAPP_UPLOAD_KEY_ALIAS')
+def RELEASE_KEY_PASSWORD = envOrProp('MYAPP_UPLOAD_KEY_PASSWORD', 'MYAPP_UPLOAD_KEY_PASSWORD')
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -92,6 +109,16 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (RELEASE_STORE_FILE && RELEASE_STORE_PASSWORD && RELEASE_KEY_ALIAS && RELEASE_KEY_PASSWORD) {
+                storeFile file(RELEASE_STORE_FILE)
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias RELEASE_KEY_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+            } else {
+                println "[warn] Release signing is not fully configured. Set env vars or project properties for keystore."
+            }
+        }
     }
     buildTypes {
         debug {
@@ -100,9 +127,9 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -119,9 +146,6 @@ dependencies {
     // Firebase BoM to align Firebase library versions
     implementation platform("com.google.firebase:firebase-bom:32.7.4")
 }
-
-// Apply the Google Services plugin for Firebase
-apply plugin: "com.google.gms.google-services"
 
 // Ensure vector icon fonts are bundled into the app
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"

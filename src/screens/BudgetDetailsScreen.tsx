@@ -6,6 +6,7 @@ import { Input } from '../components/ui/Input';
 import { PromptModal } from '../components/ui/PromptModal';
 import { useBudgets } from '../context/BudgetContext';
 import { useCategories } from '../context/CategoryContext';
+import { useSettings } from '../context/SettingsContext';
 import { Colors } from '../theme/colors';
 import { useI18n } from '../utils/i18n';
 
@@ -33,6 +34,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
   const [anchorDateISO] = useState<string>(editing?.anchorDateISO ?? new Date().toISOString().slice(0, 10));
   const [recurringStopISO, setRecurringStopISO] = useState<string | undefined>(editing?.recurringStopISO);
   const [showStopPicker, setShowStopPicker] = useState(false);
+  const { locale } = useSettings();
 
   const [scopeModalVisible, setScopeModalVisible] = useState(false);
   const [pendingUpdates, setPendingUpdates] = useState<any | null>(null);
@@ -105,6 +107,16 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
     pickerLike: { borderWidth: 1, borderColor: Colors.border, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: Colors.surface },
   });
 
+  const isDarkBg = (() => {
+    const hex = Colors.background || '#000000';
+    const h = hex.replace('#','');
+    const r = parseInt(h.substring(0,2),16) || 0;
+    const g = parseInt(h.substring(2,4),16) || 0;
+    const b = parseInt(h.substring(4,6),16) || 0;
+    const luminance = 0.2126*r + 0.7152*g + 0.0722*b; // 0-255
+    return luminance < 128;
+  })();
+
   return (
     <ScrollView style={stylesDyn.container} contentContainerStyle={{ padding: 16 }}>
       <Text style={stylesDyn.heading}>{editing ? t('budget.edit') : t('budget.new')}</Text>
@@ -121,6 +133,9 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
             minimumDate={new Date()}
+            locale={locale}
+            themeVariant={isDarkBg ? 'dark' : 'light'}
+            {...(Platform.OS === 'ios' ? { textColor: Colors.text as any } : {})}
             onChange={(event: any, selected?: Date) => {
               // Hide immediately for both platforms
               setShowDatePicker(false);
@@ -166,6 +181,9 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
               mode="date"
               display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
               minimumDate={new Date(dateISO)}
+              locale={locale}
+              themeVariant={isDarkBg ? 'dark' : 'light'}
+              {...(Platform.OS === 'ios' ? { textColor: Colors.text as any } : {})}
               onChange={(event: any, selected?: Date) => {
                 setShowStopPicker(false);
                 if (selected) {

@@ -15,7 +15,7 @@ export interface IconButtonProps {
   family?: 'MaterialIcons' | 'MaterialCommunityIcons';
 }
 
-export function IconButton({ name, onPress, size = 18, color = '#FFFFFF', style, disabled, backgroundColor = 'transparent', round = true, family = 'MaterialIcons' }: IconButtonProps) {
+export function IconButton({ name, onPress, size = 18, color = '#111827', style, disabled, backgroundColor = 'transparent', round = true, family = 'MaterialIcons' }: IconButtonProps) {
   const IconComponent = family === 'MaterialCommunityIcons' ? MaterialCommunityIcons : MaterialIcons;
   return (
     <TouchableOpacity onPress={onPress} disabled={disabled} style={[styles.base, { backgroundColor, borderRadius: round ? 6 : 0 }, style]}>

@@ -43,6 +43,16 @@ export function MonthPicker({ yearMonth, onChange, minYearMonth }: MonthPickerPr
   const prev = addMonths(yearMonth, -1);
   const next = addMonths(yearMonth, 1);
   const minBlocked = !!minYearMonth && compareYM(prev, minYearMonth) < 0;
+
+  const styles = StyleSheet.create({
+    row: { flexDirection: 'row', alignItems: 'center' },
+    side: { flexBasis: '30%', maxWidth: '30%' },
+    center: { flexBasis: '40%', maxWidth: '40%', alignItems: 'center' },
+    label: { fontWeight: '700', color: Colors.text },
+    button: { width: '100%', backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+    buttonText: { color: Colors.text },
+  });
+
   return (
     <View style={styles.row}>
       <View style={styles.side}>
@@ -60,7 +70,11 @@ export function MonthPicker({ yearMonth, onChange, minYearMonth }: MonthPickerPr
           iconColor={styles.buttonText.color as string}
         />
       </View>
-      <View style={styles.center}><Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">{centerLabel(yearMonth, locale)}</Text></View>
+      <View style={styles.center}>
+        <Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">
+          {centerLabel(yearMonth, locale)}
+        </Text>
+      </View>
       <View style={styles.side}>
         <Button
           textStyle={styles.buttonText}
@@ -78,14 +92,5 @@ export function MonthPicker({ yearMonth, onChange, minYearMonth }: MonthPickerPr
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center' },
-  side: { flexBasis: '30%', maxWidth: '30%'},
-  center: { flexBasis: '40%', maxWidth: '40%', alignItems: 'center' },
-  label: { fontWeight: '700', color: Colors.text },
-  button: { width: '100%', backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
-  buttonText: { color: Colors.mutedText }
-});
 
 
