@@ -43,28 +43,17 @@ export function LoanHistoryScreen() {
     return list;
   }, [loans, useCustomRange, startISO, endISO, categoryFilter, nameFilter]);
 
-  function bucketKey(date: Date): string {
-    if (period === 'weekly') {
-      const first = new Date(date.getFullYear(),0,1);
-      const diff = Math.floor((date.getTime() - first.getTime()) / (7*24*3600*1000));
-      return `W${diff+1} ${date.getFullYear()}`;
-    }
-    if (period === 'quarterly') {
-      return `Q${Math.floor(date.getMonth()/3)+1} ${date.getFullYear()}`;
-    }
-    if (period === 'annual') {
-      return `${date.getFullYear()}`;
-    }
-    return date.toLocaleString(locale, { month: 'short', year: 'numeric' });
-  }
+  // Helpers for progressive chronological buckets
+  function startOfWeek(d: Date): Date { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); const day = x.getDay(); x.setDate(x.getDate()-day); x.setHours(0,0,0,0); return x; }
+  function startOfMonth(d: Date): Date { return new Date(d.getFullYear(), d.getMonth(), 1); }
+  function startOfQuarter(d: Date): Date { const q = Math.floor(d.getMonth()/3)*3; return new Date(d.getFullYear(), q, 1); }
+  function startOfYear(d: Date): Date { return new Date(d.getFullYear(), 0, 1); }
+  function addStep(d: Date): Date { if (period==='weekly') return new Date(d.getFullYear(), d.getMonth(), d.getDate()+7); if (period==='quarterly') return new Date(d.getFullYear(), d.getMonth()+3, 1); if (period==='annual') return new Date(d.getFullYear()+1, 0, 1); return new Date(d.getFullYear(), d.getMonth()+1, 1); }
+  function bucketStart(d: Date): Date { if (period==='weekly') return startOfWeek(d); if (period==='quarterly') return startOfQuarter(d); if (period==='annual') return startOfYear(d); return startOfMonth(d); }
+  function bucketKeyFromDate(d: Date): string { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
+  function bucketLabelFromStart(d: Date): string { if (period==='weekly') return d.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' }); if (period==='quarterly') return `Q${Math.floor(d.getMonth()/3)+1} ${d.getFullYear()}`; if (period==='annual') return `${d.getFullYear()}`; return d.toLocaleString(locale, { month: 'short', year: 'numeric' }); }
 
   const { categories, owedToMeSeries, iOweSeries, paidToMeSeries, paidByMeSeries, totals } = useMemo(() => {
-    const bucketSet = new Set<string>();
-    const owedMap = new Map<string, number>();
-    const oweMap = new Map<string, number>();
-    const paidToMeMap = new Map<string, number>();
-    const paidByMeMap = new Map<string, number>();
-
     if (useCustomRange && startISO && endISO) {
       const label = `${new Date(startISO).toLocaleDateString(locale)} - ${new Date(endISO).toLocaleDateString(locale)}`;
       const owed = itemsInRange.filter((l:any)=>l.type==='owedToMe').reduce((s:number,l:any)=>s+(l.principal||0),0);
@@ -74,28 +63,52 @@ export function LoanHistoryScreen() {
       return { categories: [label], owedToMeSeries: [owed], iOweSeries: [owe], paidToMeSeries: [paidToMe], paidByMeSeries: [paidByMe], totals: { owedToMe: owed, iOwe: owe } };
     }
 
+    if (!itemsInRange.length) {
+      return { categories: [], owedToMeSeries: [], iOweSeries: [], paidToMeSeries: [], paidByMeSeries: [], totals: { owedToMe: 0, iOwe: 0 } };
+    }
+
+    // Determine min/max from issues and payments
+    const issueDates = itemsInRange.map((l:any)=> new Date(l.loanDate || l.createdAt).getTime());
+    const paymentDates = itemsInRange.flatMap((l:any)=> (l.payments||[]).map((p:any)=> new Date(p.date).getTime()));
+    const allDates = issueDates.concat(paymentDates);
+    const minTs = Math.min(...allDates);
+    const maxTs = Math.max(...allDates);
+    let cur = bucketStart(new Date(minTs));
+    const end = new Date(maxTs);
+
+    const order: string[] = [];
+    const labels = new Map<string,string>();
+    while (cur.getTime() <= end.getTime()) {
+      const key = bucketKeyFromDate(cur);
+      order.push(key);
+      labels.set(key, bucketLabelFromStart(cur));
+      cur = addStep(cur);
+    }
+
+    // Aggregate into buckets
+    const owedMap = new Map<string, number>();
+    const oweMap = new Map<string, number>();
+    const paidToMeMap = new Map<string, number>();
+    const paidByMeMap = new Map<string, number>();
+
     itemsInRange.forEach((l: any) => {
-      const issueKey = bucketKey(new Date(l.loanDate || l.createdAt));
-      bucketSet.add(issueKey);
-      if (l.type === 'owedToMe') owedMap.set(issueKey, (owedMap.get(issueKey) || 0) + (l.principal || 0));
-      else oweMap.set(issueKey, (oweMap.get(issueKey) || 0) + (l.principal || 0));
+      const k = bucketKeyFromDate(bucketStart(new Date(l.loanDate || l.createdAt)));
+      if (l.type === 'owedToMe') owedMap.set(k, (owedMap.get(k) || 0) + (l.principal || 0));
+      else oweMap.set(k, (oweMap.get(k) || 0) + (l.principal || 0));
       (l.payments || []).forEach((p: any) => {
-        const pKey = bucketKey(new Date(p.date));
-        bucketSet.add(pKey);
-        if (l.type === 'owedToMe') {
-          paidToMeMap.set(pKey, (paidToMeMap.get(pKey) || 0) + (p.amount || 0));
-        } else {
-          paidByMeMap.set(pKey, (paidByMeMap.get(pKey) || 0) + (p.amount || 0));
-        }
+        const pk = bucketKeyFromDate(bucketStart(new Date(p.date)));
+        if (l.type === 'owedToMe') paidToMeMap.set(pk, (paidToMeMap.get(pk) || 0) + (p.amount || 0));
+        else paidByMeMap.set(pk, (paidByMeMap.get(pk) || 0) + (p.amount || 0));
       });
     });
-    const buckets = Array.from(bucketSet).sort((a,b) => a.localeCompare(b));
-    const owedData = buckets.map(k => owedMap.get(k) || 0);
-    const oweData = buckets.map(k => oweMap.get(k) || 0);
-    const paidToMeData = buckets.map(k => paidToMeMap.get(k) || 0);
-    const paidByMeData = buckets.map(k => paidByMeMap.get(k) || 0);
+
+    const owedData = order.map(k => owedMap.get(k) || 0);
+    const oweData = order.map(k => oweMap.get(k) || 0);
+    const paidToMeData = order.map(k => paidToMeMap.get(k) || 0);
+    const paidByMeData = order.map(k => paidByMeMap.get(k) || 0);
+    const cats = order.map(k => labels.get(k) || k);
     const totals = { owedToMe: owedData.reduce((s,n)=>s+n,0), iOwe: oweData.reduce((s,n)=>s+n,0) };
-    return { categories: buckets, owedToMeSeries: owedData, iOweSeries: oweData, paidToMeSeries: paidToMeData, paidByMeSeries: paidByMeData, totals };
+    return { categories: cats, owedToMeSeries: owedData, iOweSeries: oweData, paidToMeSeries: paidToMeData, paidByMeSeries: paidByMeData, totals };
   }, [itemsInRange, period, useCustomRange, startISO, endISO, locale]);
 
   const styles = StyleSheet.create({

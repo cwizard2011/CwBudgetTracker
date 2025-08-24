@@ -47,6 +47,19 @@ export function LoanScreen({ navigation }: any) {
     setPayModalVisible(true);
   };
 
+  // Detect dark vs light background from current theme
+  const isDarkBg = (() => {
+    const hex = (Colors.background || '#000000').replace('#','');
+    const r = parseInt(hex.substring(0,2),16) || 0;
+    const g = parseInt(hex.substring(2,4),16) || 0;
+    const b = parseInt(hex.substring(4,6),16) || 0;
+    const luminance = 0.2126*r + 0.7152*g + 0.0722*b; // 0-255
+    return luminance < 128;
+  })();
+  const btnNeutralStyle = { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border } as const;
+  const btnNeutralText = { color: Colors.text } as const;
+  const summaryLabelColor = Colors.text;
+
   const handleSavePayment = async () => {
     const amt = parseFloat(payAmount);
     if (!isNaN(amt) && amt > 0 && selectedLoanId) {
@@ -95,15 +108,15 @@ export function LoanScreen({ navigation }: any) {
           : [{ title: t('common.all'), data: list }];
         return (
           <>
-            <View style={styles.summaryCard}>
-              <View style={styles.summaryRow}><Text style={styles.summaryLabel}>{t('loans.owedToMe')}</Text><Text style={styles.summaryValue}>{formatCurrency(owedToMeOutstanding, locale, currency)}</Text></View>
-              <View style={styles.summaryRow}><Text style={styles.summaryLabel}>{t('loans.iOwe')}</Text><Text style={styles.summaryValue}>{formatCurrency(iOweOutstanding, locale, currency)}</Text></View>
-              <View style={styles.summaryRow}><Text style={styles.summaryLabel}>{t('loans.repaid')}</Text><Text style={styles.summaryValue}>{formatCurrency(repaidByMe, locale, currency)}</Text></View>
-              <View style={styles.summaryRow}><Text style={styles.summaryLabel}>{t('loans.recovered')}</Text><Text style={styles.summaryValue}>{formatCurrency(recoveredFromBorrowers, locale, currency)}</Text></View>
+            <View style={[styles.summaryCard, !isDarkBg && { backgroundColor: Colors.white }]}>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.owedToMe')}</Text><Text style={styles.summaryValue}>{formatCurrency(owedToMeOutstanding, locale, currency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.iOwe')}</Text><Text style={styles.summaryValue}>{formatCurrency(iOweOutstanding, locale, currency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.repaid')}</Text><Text style={styles.summaryValue}>{formatCurrency(repaidByMe, locale, currency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.recovered')}</Text><Text style={styles.summaryValue}>{formatCurrency(recoveredFromBorrowers, locale, currency)}</Text></View>
               <View style={[styles.summaryRow, { marginTop: 6, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border, paddingTop: 6 }]}>
-                <Text style={[styles.summaryLabel, { fontWeight: '700' }]}>{t('loans.totalPrincipal')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(totals.principal, locale, currency)}</Text>
+                <Text style={[{ color: summaryLabelColor }, { fontWeight: '700' }]}>{t('loans.totalPrincipal')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(totals.principal, locale, currency)}</Text>
               </View>
-              <View style={styles.summaryRow}><Text style={[styles.summaryLabel, { fontWeight: '700' }]}>{t('loans.totalBalance')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(totals.balance, locale, currency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={[{ color: summaryLabelColor }, { fontWeight: '700' }]}>{t('loans.totalBalance')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(totals.balance, locale, currency)}</Text></View>
             </View>
             <SectionList
               sections={sections}
@@ -115,7 +128,9 @@ export function LoanScreen({ navigation }: any) {
                 <View style={styles.item}>
                   <View style={{ flex: 1, marginRight: 8 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <Text style={[styles.title, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">{item.counterpartName}</Text>
+                    <Text style={{ fontWeight: '600', color: Colors.text, flex: 1 }} numberOfLines={1} ellipsizeMode="tail">
+                      {item.counterpartName}
+                    </Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0, marginLeft: 8 }}>
                         <IconButton family="MaterialIcons" name="attach-money" onPress={() => openPayModal(item.id)} style={{ marginLeft: 4 }} backgroundColor={Colors.successLight} color={Colors.white} />
                         <IconButton family="MaterialIcons" name="receipt" onPress={() => rootNavigate('LoanInvoice', { loan: item })} style={{ marginLeft: 4 }} backgroundColor={Colors.secondaryLight} color={Colors.white} />
@@ -185,16 +200,16 @@ export function LoanScreen({ navigation }: any) {
         <View>
           <Text style={{ color: Colors.mutedText, marginBottom: 8 }}>Filter By</Text>
           <View style={{ flexDirection: 'row', marginBottom: 12 }}>
-            <Button title="None" variant={filterMode === 'none' ? 'primary' : 'neutral'} onPress={() => { setFilterMode('none'); setFilterName(undefined); }} small style={{ marginRight: 8 }} />
-            <Button title="Borrower" variant={filterMode === 'borrower' ? 'primary' : 'neutral'} onPress={() => { setFilterMode('borrower'); setFilterName(undefined); }} small style={{ marginRight: 8 }} />
-            <Button title="Lender" variant={filterMode === 'lender' ? 'primary' : 'neutral'} onPress={() => { setFilterMode('lender'); setFilterName(undefined); }} small />
+            <Button title="None" variant={filterMode === 'none' ? 'primary' : 'neutral'} onPress={() => { setFilterMode('none'); setFilterName(undefined); }} small style={filterMode === 'none' ? { marginRight: 8 } : { marginRight: 8, ...btnNeutralStyle }} textStyle={filterMode === 'none' ? undefined : (btnNeutralText as any)} />
+            <Button title="Borrower" variant={filterMode === 'borrower' ? 'primary' : 'neutral'} onPress={() => { setFilterMode('borrower'); setFilterName(undefined); }} small style={filterMode === 'borrower' ? { marginRight: 8 } : { marginRight: 8, ...btnNeutralStyle }} textStyle={filterMode === 'borrower' ? undefined : (btnNeutralText as any)} />
+            <Button title="Lender" variant={filterMode === 'lender' ? 'primary' : 'neutral'} onPress={() => { setFilterMode('lender'); setFilterName(undefined); }} small style={filterMode === 'lender' ? undefined : ({ ...btnNeutralStyle } as any)} textStyle={filterMode === 'lender' ? undefined : (btnNeutralText as any)} />
           </View>
           {filterMode !== 'none' && (
             <View style={{ maxHeight: 240 }}>
               <Text style={{ color: Colors.mutedText, marginBottom: 8 }}>Select {filterMode === 'borrower' ? 'Borrower' : 'Lender'}</Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                 <View style={{ margin: 4 }}>
-                  <Button title="All" variant={!filterName ? 'primary' : 'neutral'} onPress={() => setFilterName(undefined)} small />
+                  <Button title="All" variant={!filterName ? 'primary' : 'neutral'} onPress={() => setFilterName(undefined)} small style={!filterName ? undefined : ({ ...btnNeutralStyle } as any)} textStyle={!filterName ? undefined : (btnNeutralText as any)} />
                 </View>
                 {(() => {
                   const useBorrowers = filterMode === 'borrower';
@@ -210,7 +225,7 @@ export function LoanScreen({ navigation }: any) {
                   });
                   return ordered.map(n => (
                     <View key={n} style={{ margin: 4 }}>
-                      <Button title={n} variant={filterName === n ? 'primary' : 'neutral'} onPress={() => setFilterName(n)} small />
+                      <Button title={n} variant={filterName === n ? 'primary' : 'neutral'} onPress={() => setFilterName(n)} small style={filterName === n ? undefined : ({ ...btnNeutralStyle } as any)} textStyle={filterName === n ? undefined : (btnNeutralText as any)} />
                     </View>
                   ));
                 })()}

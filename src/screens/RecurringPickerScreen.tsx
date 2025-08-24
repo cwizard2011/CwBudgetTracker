@@ -33,7 +33,7 @@ export function RecurringPickerScreen({ route, navigation }: any) {
         data={options}
         keyExtractor={(i) => i.key}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => { onSelect?.(item.key); navigation.goBack?.(); }} style={styles.row}>
+          <TouchableOpacity onPress={() => { onSelect?.(item.key); }} style={styles.row}>
             <Text style={[styles.text, item.key === value && styles.active]}>{item.label}</Text>
           </TouchableOpacity>
         )}

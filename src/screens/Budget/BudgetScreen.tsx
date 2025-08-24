@@ -115,7 +115,7 @@ export function BudgetScreen() {
       </View>
 
       <View style={[styles.rowWrap, { marginTop: 12 }]}> 
-        <Text style={styles.sectionHeading}>{t('budget.summaries')}</Text>
+        <Text style={{ fontWeight: '700', color: Colors.text }}>{t('budget.summaries')}</Text>
         {summaries.map(s => (
           <View key={s.k} style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
             <Text style={{ color: Colors.text }}>{s.k}</Text>
@@ -153,11 +153,11 @@ export function BudgetScreen() {
           <View style={styles.item}>
             <View style={{ flex: 1, marginRight: 8 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={[styles.title, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
+                <Text style={{ fontWeight: '600', color: Colors.text, flex: 1 }} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0, marginLeft: 8 }}>
-                  <IconButton family="MaterialIcons" name="attach-money" onPress={() => openSpendModal(item.id)} style={{ marginLeft: 4 }} backgroundColor={Colors.successLight} />
-                  <IconButton family="MaterialIcons" name="edit" onPress={() => { const { navigate } = require('../../utils/navigationRef'); (navigate as any)('BudgetDetails', { budget: item }); }} style={{ marginLeft: 4 }} backgroundColor={Colors.secondaryLight} />
-                  <IconButton family="MaterialIcons" name="delete" onPress={() => openDeleteModal(item.id)} style={{ marginLeft: 4 }} backgroundColor={Colors.errorLight} />
+                  <IconButton family="MaterialIcons" name="attach-money" onPress={() => openSpendModal(item.id)} style={{ marginLeft: 4 }} backgroundColor={Colors.successLight} color={Colors.white} />
+                  <IconButton family="MaterialIcons" name="edit" onPress={() => { const { navigate } = require('../../utils/navigationRef'); (navigate as any)('BudgetDetails', { budget: item }); }} style={{ marginLeft: 4 }} backgroundColor={Colors.secondaryLight} color={Colors.white} />
+                  <IconButton family="MaterialIcons" name="delete" onPress={() => openDeleteModal(item.id)} style={{ marginLeft: 4 }} backgroundColor={Colors.errorLight} color={Colors.white} />
                 </View>
               </View>
               <Text style={{ marginBottom: 6, color: Colors.text }}>{formatCurrency(item.amountSpent || 0, locale, currency)} / {formatCurrency(item.amountPlanned || 0, locale, currency)}</Text>

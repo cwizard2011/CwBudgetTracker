@@ -38,25 +38,57 @@ export function BudgetHistoryScreen() {
     return budgets;
   }, [budgets, useCustomRange, startISO, endISO]);
 
-  function bucketKey(date: Date): string {
+  // Helpers to build progressive, chronological buckets
+  function startOfWeek(d: Date): Date {
+    const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const day = x.getDay(); // Sunday=0
+    x.setDate(x.getDate() - day);
+    x.setHours(0,0,0,0);
+    return x;
+  }
+  function startOfMonth(d: Date): Date {
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  }
+  function startOfQuarter(d: Date): Date {
+    const q = Math.floor(d.getMonth()/3) * 3;
+    return new Date(d.getFullYear(), q, 1);
+  }
+  function startOfYear(d: Date): Date {
+    return new Date(d.getFullYear(), 0, 1);
+  }
+  function addStep(d: Date): Date {
+    if (period === 'weekly') return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 7);
+    if (period === 'quarterly') return new Date(d.getFullYear(), d.getMonth() + 3, 1);
+    if (period === 'annual') return new Date(d.getFullYear() + 1, 0, 1);
+    return new Date(d.getFullYear(), d.getMonth() + 1, 1); // monthly default
+  }
+  function bucketStart(d: Date): Date {
+    if (period === 'weekly') return startOfWeek(d);
+    if (period === 'quarterly') return startOfQuarter(d);
+    if (period === 'annual') return startOfYear(d);
+    return startOfMonth(d);
+  }
+  function bucketKeyFromDate(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+  function bucketLabelFromStart(d: Date): string {
     if (period === 'weekly') {
-      const first = new Date(date.getFullYear(),0,1);
-      const diff = Math.floor((date.getTime() - first.getTime()) / (7*24*3600*1000));
-      return `W${diff+1} ${date.getFullYear()}`;
+      // Label by start date of week
+      return d.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
     }
     if (period === 'quarterly') {
-      return `Q${Math.floor(date.getMonth()/3)+1} ${date.getFullYear()}`;
+      return `Q${Math.floor(d.getMonth()/3)+1} ${d.getFullYear()}`;
     }
     if (period === 'annual') {
-      return `${date.getFullYear()}`;
+      return `${d.getFullYear()}`;
     }
-    return date.toLocaleString(locale, { month: 'short', year: 'numeric' });
+    return d.toLocaleString(locale, { month: 'short', year: 'numeric' });
   }
 
   const { categories, plannedSeries, spentSeries, totals } = useMemo(() => {
-    const map = new Map<string, { planned: number; spent: number }>();
-    const buckets: string[] = [];
-
     if (useCustomRange && startISO && endISO) {
       const label = `${new Date(startISO).toLocaleDateString(locale)} - ${new Date(endISO).toLocaleDateString(locale)}`;
       const p = itemsInRange.reduce((s: number, b: any) => s + (b.amountPlanned||0), 0);
@@ -64,22 +96,42 @@ export function BudgetHistoryScreen() {
       return { categories: [label], plannedSeries: [p], spentSeries: [sp], totals: { planned: p, spent: sp } };
     }
 
+    if (!itemsInRange.length) {
+      return { categories: [], plannedSeries: [], spentSeries: [], totals: { planned: 0, spent: 0 } };
+    }
+
+    // Determine chronological range based on data dates
+    const dataDates = itemsInRange.map((b: any) => new Date(b.dateISO || `${b.period}-01`).getTime());
+    const minTs = Math.min(...dataDates);
+    const maxTs = Math.max(...dataDates);
+    let cur = bucketStart(new Date(minTs));
+    const end = new Date(maxTs);
+
+    const order: string[] = [];
+    const labels = new Map<string, string>();
+    while (cur.getTime() <= end.getTime()) {
+      const key = bucketKeyFromDate(cur);
+      order.push(key);
+      labels.set(key, bucketLabelFromStart(cur));
+      cur = addStep(cur);
+    }
+
+    // Aggregate values into bucket keys
+    const map = new Map<string, { planned: number; spent: number }>();
     itemsInRange.forEach((b: any) => {
-      const key = bucketKey(new Date(b.dateISO || `${b.period}-01`));
-      if (!buckets.includes(key)) buckets.push(key);
-      const agg = map.get(key) || { planned: 0, spent: 0 };
+      const d = new Date(b.dateISO || `${b.period}-01`);
+      const k = bucketKeyFromDate(bucketStart(d));
+      const agg = map.get(k) || { planned: 0, spent: 0 };
       agg.planned += b.amountPlanned || 0;
       agg.spent += b.amountSpent || 0;
-      map.set(key, agg);
+      map.set(k, agg);
     });
-    buckets.sort((a,b) => a.localeCompare(b));
-    const planned = buckets.map(k => map.get(k)?.planned || 0);
-    const spent = buckets.map(k => map.get(k)?.spent || 0);
-    const totals = {
-      planned: planned.reduce((s,n)=>s+n,0),
-      spent: spent.reduce((s,n)=>s+n,0),
-    };
-    return { categories: buckets, plannedSeries: planned, spentSeries: spent, totals };
+
+    const planned = order.map(k => map.get(k)?.planned || 0);
+    const spent = order.map(k => map.get(k)?.spent || 0);
+    const totals = { planned: planned.reduce((s,n)=>s+n,0), spent: spent.reduce((s,n)=>s+n,0) };
+    const cats = order.map(k => labels.get(k) || k);
+    return { categories: cats, plannedSeries: planned, spentSeries: spent, totals };
   }, [itemsInRange, period, useCustomRange, startISO, endISO, locale]);
 
   const styles = StyleSheet.create({

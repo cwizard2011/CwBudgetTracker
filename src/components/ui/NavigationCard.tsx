@@ -8,18 +8,22 @@ export interface NavigationCardProps {
   icon?: string; // e.g. emoji or glyph
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
+  iconSize?: number;
 }
 
-export function NavigationCard({ title, color = Colors.primary, icon = '📄', onPress, style }: NavigationCardProps) {
+export function NavigationCard({ title, color = Colors.primary, icon = '📄', onPress, style, iconSize }: NavigationCardProps) {
   const textColor = '#FFFFFF';
+  const [measuredHeight, setMeasuredHeight] = React.useState<number>(0);
+  const computedIconSize = iconSize || Math.max(28, Math.min(96, Math.floor((measuredHeight || 0) * 0.4) || 72));
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[styles.card, { backgroundColor: color }, style]}
+      onLayout={(e) => setMeasuredHeight(e.nativeEvent.layout.height)}
       accessibilityRole="button"
       accessibilityLabel={title}
     >
-      <Text style={[styles.icon, { color: textColor }]}>{icon}</Text>
+      <Text style={[styles.icon, { color: textColor, fontSize: computedIconSize }]}>{icon}</Text>
       <Text style={[styles.title, { color: textColor }]}>{title}</Text>
     </TouchableOpacity>
   );
@@ -28,14 +32,12 @@ export function NavigationCard({ title, color = Colors.primary, icon = '📄', o
 const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
-    paddingVertical: 32,
+    paddingVertical: 16,
     paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 220,
   },
   icon: {
-    fontSize: 72,
     marginBottom: 12,
   },
   title: {

@@ -6,6 +6,7 @@ import { IconButton } from '../../components/ui/IconButton';
 import { Input } from '../../components/ui/Input';
 import { PromptModal } from '../../components/ui/PromptModal';
 import { useLoans } from '../../context/LoanContext';
+import { useSettings } from '../../context/SettingsContext';
 import { Colors } from '../../theme/colors';
 import { useI18n } from '../../utils/i18n';
 
@@ -13,6 +14,7 @@ export function LodgeLoanScreen({ navigation, route }: any) {
   const { addLoan, updateLoanBasic, counterparties, loans } = useLoans() as any;
   const editingLoan = route?.params?.loan as (undefined | { id: string; counterpartName: string; type: 'owedByMe'|'owedToMe'; principal: number; loanDate: number });
   const t = useI18n();
+  const { locale } = useSettings();
   const [type, setType] = useState<'owedByMe' | 'owedToMe'>(editingLoan?.type || 'owedByMe');
   const [name, setName] = useState(editingLoan?.counterpartName || '');
   const [selectedCpId, setSelectedCpId] = useState<string | undefined>();
@@ -29,6 +31,16 @@ export function LodgeLoanScreen({ navigation, route }: any) {
     const [y,m,d] = dateISO.split('-').map(n => parseInt(n,10));
     return new Date(y, (m||1)-1, d||1);
   }, [dateISO]);
+
+  // Match Add Budget screen picker styling (theme-aware)
+  const isDarkBg = (() => {
+    const hex = (Colors.background || '#000000').replace('#','');
+    const r = parseInt(hex.substring(0,2),16) || 0;
+    const g = parseInt(hex.substring(2,4),16) || 0;
+    const b = parseInt(hex.substring(4,6),16) || 0;
+    const luminance = 0.2126*r + 0.7152*g + 0.0722*b; // 0-255
+    return luminance < 128;
+  })();
 
   const canSave = useMemo(() => {
     const nm = (selectedCpId || name.trim());
@@ -96,7 +108,7 @@ export function LodgeLoanScreen({ navigation, route }: any) {
       navigation.goBack();
       return;
     }
-    const typedName = name || (counterparties.find(c => c.id === selectedCpId)?.name || '');
+    const typedName = name || (counterparties.find((c: { id: string; name: string }) => c.id === selectedCpId)?.name || '');
     // Build candidate names from counterparties and existing loans
     const existingNamesSet = new Set<string>();
     counterparties.forEach((c: { id: string; name: string; lastUsedAt?: number }) => existingNamesSet.add(c.name));
@@ -169,6 +181,9 @@ export function LodgeLoanScreen({ navigation, route }: any) {
             value={dateObj}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
+            themeVariant={isDarkBg ? ('dark' as any) : ('light' as any)}
+            locale={locale}
+            {...(Platform.OS === 'ios' ? { textColor: Colors.text as any } : {})}
             maximumDate={new Date()}
             onChange={(event: any, selected?: Date) => {
               setShowDatePicker(false);
@@ -183,7 +198,18 @@ export function LodgeLoanScreen({ navigation, route }: any) {
         )}
       </View>
 
-      <Input placeholder={t('common.notes')} value={notes} onChangeText={setNotes} style={{ marginBottom: 16 }} />
+      <Input
+        placeholder={t('common.notes')}
+        value={notes}
+        onChangeText={(v) => {
+          if (v.length <= 500) setNotes(v);
+        }}
+        multiline
+        numberOfLines={5}
+        maxLength={500}
+        style={{ marginBottom: 6, height: 120, textAlignVertical: 'top' as any }}
+      />
+      <Text style={{ color: Colors.mutedText, marginBottom: 10, textAlign: 'right' }}>{`${notes.length}/500`}</Text>
       <Button title={t('common.save')} onPress={onSave} variant={canSave ? 'primary' : 'neutral'} disabled={!canSave} />
 
       {/* Confirm Merge or New */}

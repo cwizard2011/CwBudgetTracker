@@ -197,7 +197,16 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
           )}
         </View>
       )}
-      <Input placeholder={t('common.notes')} value={notes} onChangeText={setNotes} style={{ marginBottom: 16 }} />
+      <Input
+        placeholder={t('common.notes')}
+        value={notes}
+        onChangeText={(v) => { if (v.length <= 500) setNotes(v); }}
+        multiline
+        numberOfLines={5}
+        maxLength={500}
+        style={{ marginBottom: 6, height: 120, textAlignVertical: 'top' as any }}
+      />
+      <Text style={{ color: Colors.mutedText, marginBottom: 16, textAlign: 'right' }}>{`${notes.length}/500`}</Text>
       <Button title={t('common.save')} onPress={handleSave} variant="primary" />
 
       <PromptModal visible={scopeModalVisible} title={t('budget.applyChangesTo')} onCancel={() => setScopeModalVisible(false)} showConfirm={false} cancelText={t('common.close')}>
