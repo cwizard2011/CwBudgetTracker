@@ -74,9 +74,9 @@ export function LoanScreen({ navigation }: any) {
     <View style={[styles.container, { backgroundColor: Colors.background }] }>
       <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <IconButton family="MaterialIcons" name="filter-list" onPress={() => setFilterModalVisible(true)} style={styles.icon} backgroundColor={Colors.white} color={Colors.primaryDark} />
-          <IconButton family="MaterialIcons" name="sort" onPress={() => setSortModalVisible(true)} style={styles.icon} backgroundColor={Colors.white} color={Colors.secondaryDark} />
-          <IconButton family="MaterialIcons" name="category" onPress={() => setGroupModalVisible(true)} style={styles.icon} backgroundColor={Colors.white} color={Colors.warningDark} />
+          <IconButton family="MaterialIcons" name="filter-list" onPress={() => setFilterModalVisible(true)} style={styles.icon} backgroundColor={Colors.surface} color={Colors.primaryDark} />
+          <IconButton family="MaterialIcons" name="sort" onPress={() => setSortModalVisible(true)} style={styles.icon} backgroundColor={Colors.surface} color={Colors.secondaryDark} />
+          <IconButton family="MaterialIcons" name="category" onPress={() => setGroupModalVisible(true)} style={styles.icon} backgroundColor={Colors.surface} color={Colors.warningDark} />
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {(filterMode !== 'none' || filterName || sortKey !== 'date' || sortDir !== 'desc' || groupByType) && (
@@ -108,7 +108,7 @@ export function LoanScreen({ navigation }: any) {
           : [{ title: t('common.all'), data: list }];
         return (
           <>
-            <View style={[styles.summaryCard, !isDarkBg && { backgroundColor: Colors.white }]}>
+            <View style={[styles.summaryCard, { backgroundColor: isDarkBg ? Colors.surface : Colors.white }]}>
               <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.owedToMe')}</Text><Text style={styles.summaryValue}>{formatCurrency(owedToMeOutstanding, locale, currency)}</Text></View>
               <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.iOwe')}</Text><Text style={styles.summaryValue}>{formatCurrency(iOweOutstanding, locale, currency)}</Text></View>
               <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.repaid')}</Text><Text style={styles.summaryValue}>{formatCurrency(repaidByMe, locale, currency)}</Text></View>
@@ -182,8 +182,13 @@ export function LoanScreen({ navigation }: any) {
             display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
             locale={locale}
             maximumDate={new Date()}
+            themeVariant={isDarkBg ? 'dark' : 'light'}
+            textColor={Colors.text}
             onChange={(event: any, selected?: Date) => {
-              setShowPayDatePicker(false);
+              if (Platform.OS === 'android') {
+                // On Android, close the picker after selection/dismissal
+                setShowPayDatePicker(false);
+              }
               if (selected) {
                 const y = selected.getFullYear();
                 const m = String(selected.getMonth() + 1).padStart(2,'0');
@@ -296,7 +301,7 @@ const styles = StyleSheet.create({
   pickerLike: { borderWidth: 1, borderColor: Colors.border, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 12 },
   title: { fontWeight: '600', color: Colors.text },
   sectionHeading: { fontWeight: '700', color: Colors.text, marginTop: 8, fontSize: 16 },
-  summaryCard: { borderWidth: 1, borderColor: Colors.border, borderRadius: 8, padding: 10, marginBottom: 8, backgroundColor: Colors.surface },
+  summaryCard: { borderWidth: 1, borderColor: Colors.border, borderRadius: 8, padding: 10, marginBottom: 8 },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 },
   summaryLabel: { color: Colors.mutedText },
   summaryValue: { color: Colors.text },

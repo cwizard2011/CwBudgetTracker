@@ -8,12 +8,15 @@
     "android:install": "adb install -r ./android/app/build/outputs/apk/release/app-release.apk",
     "android:update": "cd android && ./gradlew assembleDebug && adb install -r ./app/build/outputs/apk/debug/app-debug.apk",
     "android:update:release": "cd android && ./gradlew assembleRelease && adb install -r ./app/build/outputs/apk/release/app-release.apk",
+    "android:bundle:release": "cross-env NODE_ENV=production cd android && ./gradlew bundleRelease",
+    "android:assemble:release": "cross-env NODE_ENV=production cd android && ./gradlew assembleRelease",
     "ios:device:build": "cd ios && xcodebuild -workspace CwBudgetTracker.xcworkspace -scheme CwBudgetTracker -configuration Debug -destination 'id=$DEVICE_ID' -allowProvisioningUpdates -derivedDataPath /tmp/CwBTBuild build",
     "ios:device:install": "xcrun devicectl device install app --device $DEVICE_ID /tmp/CwBTBuild/Build/Products/Debug-iphoneos/CwBudgetTracker.app",
     "ios:device:update": "npm run ios:device:build && npm run ios:device:install",
     "ios:device:build:release": "cd ios && xcodebuild -workspace CwBudgetTracker.xcworkspace -scheme CwBudgetTracker -configuration Release -destination 'id=$DEVICE_ID' -allowProvisioningUpdates -derivedDataPath /tmp/CwBTBuildRelease build",
     "ios:device:install:release": "xcrun devicectl device install app --device $DEVICE_ID /tmp/CwBTBuildRelease/Build/Products/Release-iphoneos/CwBudgetTracker.app",
-    "ios:device:update:release": "npm run ios:device:build:release && npm run ios:device:install:release",
+    "ios:device:update:release": "cross-env NODE_ENV=production npm run ios:device:build:release && npm run ios:device:install:release",
+    "ios:simulator:build:release": "cross-env NODE_ENV=production cd ios && xcodebuild -workspace CwBudgetTracker.xcworkspace -scheme CwBudgetTracker -configuration Release -sdk iphonesimulator -derivedDataPath /tmp/CwBTBuildReleaseSim build",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"
@@ -49,17 +52,19 @@
     "@react-native-community/cli-platform-ios": "19.1.1",
     "@react-native/babel-preset": "0.80.2",
     "@react-native/eslint-config": "0.80.2",
+    "@react-native/gradle-plugin": "0.80.2",
     "@react-native/metro-config": "0.80.2",
     "@react-native/typescript-config": "0.80.2",
     "@types/jest": "^29.5.13",
     "@types/react": "^19.1.0",
     "@types/react-test-renderer": "^19.1.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "cross-env": "^10.0.0",
     "eslint": "^8.19.0",
     "jest": "^29.6.3",
     "prettier": "2.8.8",
     "react-test-renderer": "19.1.0",
-    "typescript": "5.0.4",
-    "@react-native/gradle-plugin": "0.80.2"
+    "typescript": "5.0.4"
   },
   "engines": {
     "node": ">=18"
