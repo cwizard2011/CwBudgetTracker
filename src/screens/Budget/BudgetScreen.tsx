@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { SectionList, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { IconButton } from '../../components/ui/IconButton';
 import { MonthPicker } from '../../components/ui/MonthPicker';
 import { ProgressBar } from '../../components/ui/ProgressBar';
@@ -13,18 +13,37 @@ import { ConfirmDeleteModal, DeleteModal, FilterModal, GroupModal, SortModal, Sp
 import { SectionHeader } from './components/SectionHeader';
 import { TopActions } from './components/TopActions';
 
+// Define the AppTheme type directly in this file
+// This type represents the possible theme values
+
+type AppTheme = 'light' | 'dark' | 'darkDim' | 'darkGray' | 'system';
+
+const CustomCheckbox = ({ isChecked, onPress, theme }: { isChecked: boolean; onPress: () => void; theme: AppTheme }) => {
+  const isLightTheme = theme === 'light';
+  const backgroundColor = isChecked ? (isLightTheme ? Colors.primary : Colors.accent) : 'transparent';
+  const checkColor = isLightTheme ? Colors.white : Colors.text;
+
+  return (
+    <TouchableOpacity onPress={onPress} style={{ width: 24, height: 24, borderWidth: 2, borderColor: Colors.text, alignItems: 'center', justifyContent: 'center', backgroundColor }}>
+      {isChecked && <View style={{ width: 12, height: 12, backgroundColor: checkColor }} />}
+    </TouchableOpacity>
+  );
+};
+
 export function BudgetScreen() {
-  const { budgets, updateSpent, deleteBudgetSingle, deleteBudgetSeries } = useBudgets() as any;
+  const { budgets: contextBudgets, updateSpent, deleteBudgetSingle, deleteBudgetSeries, updateBudget } = useBudgets() as any;
   const { categories } = useCategories();
-  const { locale, currency } = useSettings();
+  const { locale, currency, theme } = useSettings();
   const t = useI18n();
 
+  const [budgets, setBudgets] = useState<any[]>(contextBudgets || []);
   const [filterPeriod, setFilterPeriod] = useState(new Date().toISOString().slice(0, 7));
   const [filterCategory, setFilterCategory] = useState<string | undefined>();
   const [groupBy, setGroupBy] = useState<'date' | 'category'>('date');
   const [sortKey, setSortKey] = useState<'date' | 'amount'>('date');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [expandedBudgetId, setExpandedBudgetId] = useState<string | null>(null);
 
   const [spendModalVisible, setSpendModalVisible] = useState(false);
   const [spendAmount, setSpendAmount] = useState('');
@@ -38,6 +57,18 @@ export function BudgetScreen() {
   const defaultSortKey: 'date' | 'amount' = 'date';
   const defaultSortDir: 'asc' | 'desc' = 'desc';
   const defaultGroupBy: 'date' | 'category' = 'date';
+
+  // Remove ID generation logic for budget items
+  const initializeBudgets = (budgets: any[]) => {
+    return budgets.map(budget => {
+      // Assume items already have IDs from add budget feature
+      return { ...budget, items: budget.items || [] };
+    });
+  };
+
+  useEffect(() => {
+    setBudgets(initializeBudgets(contextBudgets));
+  }, [contextBudgets]);
 
   const hasCustomView = useMemo(() => {
     return !!(filterCategory || sortKey !== defaultSortKey || sortDir !== defaultSortDir || groupBy !== defaultGroupBy);
@@ -67,6 +98,31 @@ export function BudgetScreen() {
   };
   // edit scope handled in details screen on Save
 
+  const toggleExpandBudget = (budgetId: string) => {
+    setExpandedBudgetId(prevId => (prevId === budgetId ? null : budgetId));
+  };
+
+  const toggleItemCompletion = (itemId: string) => {
+    const updatedBudgets = budgets.map((budget: any) => {
+      let budgetUpdated = false;
+      const updatedItems = (budget.items || []).map((item: any) => {
+        if (item.id === itemId) {
+          const isCompleted = !item.isCompleted;
+          budgetUpdated = true;
+          return { ...item, isCompleted };
+        }
+        return item;
+      });
+      if (budgetUpdated) {
+        const amountSpent = updatedItems.reduce((sum: number, item: any) => sum + (item.isCompleted ? item.amount : 0), 0);
+        updateBudget(budget.id, { items: updatedItems, amountSpent: Math.max(amountSpent, 0) }); // Persist the updated items and amountSpent
+        return { ...budget, items: updatedItems, amountSpent: Math.max(amountSpent, 0) };
+      }
+      return budget;
+    });
+    setBudgets(updatedBudgets);
+  };
+
   const filtered = useMemo(() => budgets.filter((b: any) => b.period === filterPeriod && (!filterCategory || (b.category || 'Uncategorized') === filterCategory)), [budgets, filterPeriod, filterCategory]);
 
   function dateKeyOf(b: any): string { return b.dateISO || `${b.period}-01`; }
@@ -88,16 +144,6 @@ export function BudgetScreen() {
     else entries.sort((a, b) => a[0].localeCompare(b[0]));
     return entries.map(([key, data]) => ({ title: key, data: collapsed[key] ? [] : data }));
   }, [filtered, groupBy, sortKey, sortDir, collapsed]);
-
-  const summaries = useMemo(() => {
-    const byCat = new Map<string, { planned: number; spent: number }>();
-    filtered.forEach((b: any) => {
-      const k = b.category || 'Uncategorized';
-      const s = byCat.get(k) || { planned: 0, spent: 0 };
-      s.planned += b.amountPlanned; s.spent += b.amountSpent; byCat.set(k, s);
-    });
-    return Array.from(byCat.entries()).map(([k, v]) => ({ k, ...v }));
-  }, [filtered]);
 
   const monthTotals = useMemo(() => {
     const planned = filtered.reduce((s: number, b: any) => s + (b.amountPlanned || 0), 0);
@@ -166,10 +212,35 @@ export function BudgetScreen() {
                   <IconButton family="MaterialIcons" name="attach-money" onPress={() => openSpendModal(item.id)} style={{ marginLeft: 4 }} backgroundColor={Colors.successLight} color={Colors.white} />
                   <IconButton family="MaterialIcons" name="edit" onPress={() => { const { navigate } = require('../../utils/navigationRef'); (navigate as any)('BudgetDetails', { budget: item }); }} style={{ marginLeft: 4 }} backgroundColor={Colors.secondaryLight} color={Colors.white} />
                   <IconButton family="MaterialIcons" name="delete" onPress={() => openDeleteModal(item.id)} style={{ marginLeft: 4 }} backgroundColor={Colors.errorLight} color={Colors.white} />
+                  {item.items && item.items.length > 0 && (
+                    <IconButton
+                      family="MaterialIcons"
+                      name={expandedBudgetId === item.id ? "expand-less" : "expand-more"}
+                      onPress={() => toggleExpandBudget(item.id)}
+                      style={{ marginLeft: 4 }}
+                      backgroundColor={Colors.secondaryLight}
+                      color={Colors.white}
+                    />
+                  )}
                 </View>
               </View>
               <Text style={{ marginBottom: 6, color: Colors.text }}>{formatCurrency(item.amountSpent || 0, locale, currency)} / {formatCurrency(item.amountPlanned || 0, locale, currency)}</Text>
               <ProgressBar progress={item.amountPlanned ? item.amountSpent / item.amountPlanned : 0} fillColor={Colors.success} />
+              {expandedBudgetId === item.id && item.items && (
+                <View>
+                  {item.items.map((subItem: any) => (
+                    <View key={subItem.id} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+                      <CustomCheckbox
+                        isChecked={subItem.isCompleted}
+                        onPress={() => toggleItemCompletion(subItem.id)}
+                        theme={theme} // Pass the current theme here
+                      />
+                      <Text style={{ flex: 1, marginLeft: 8, color: Colors.text, textDecorationLine: subItem.isCompleted ? 'line-through' : 'none' }} numberOfLines={1} ellipsizeMode="tail">{subItem.name}</Text>
+                      <Text style={{ marginLeft: 8, color: Colors.text, textDecorationLine: subItem.isCompleted ? 'line-through' : 'none' }}>{formatCurrency(subItem.amount, locale, currency)}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
           </View>
         )}

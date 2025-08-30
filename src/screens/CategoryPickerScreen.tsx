@@ -4,6 +4,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCategories } from '../context/CategoryContext';
 import { Colors } from '../theme/colors';
+import { useI18n } from '../utils/i18n';
 
 const ICONS = [
   '🏠','💡','💧','🍎','🚌','💊','🎬','💾','🛍️','🧾','🧰','📚','🎁','🍽️','🌐','📱','🚗','🍼','🐾'
@@ -13,6 +14,7 @@ export function CategoryPickerScreen({ route, navigation }: any) {
   const { categories, addCategory } = useCategories();
   const [text, setText] = useState<string>(route?.params?.value || '');
   const [icon, setIcon] = useState<string>(route?.params?.icon || ICONS[0]);
+  const t = useI18n();
 
   const data = useMemo(() => categories, [categories]);
 
@@ -55,7 +57,6 @@ export function CategoryPickerScreen({ route, navigation }: any) {
             </TouchableOpacity>
           ))}
         </View>
-        <Button title="Save" onPress={onSave} variant="primary" style={{ marginTop: 12 }} />
       </View>
       <Text style={[styles.heading]}>Existing categories</Text>
       <FlatList
@@ -67,6 +68,7 @@ export function CategoryPickerScreen({ route, navigation }: any) {
           </TouchableOpacity>
         )}
       />
+      <Button title={t('common.save')} onPress={onSave} variant="primary" style={{ marginTop: 12 }} />
     </View>
   );
 }

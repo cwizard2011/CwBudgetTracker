@@ -25,6 +25,8 @@ const en: Dictionary = {
   'common.title': 'Title',
   'common.notes': 'Notes',
   'common.category': 'Category',
+  'common.saveAndExit': 'Save & Exit',
+  'common.saveAndAddNew': 'Save & Add New',
 
   'budget.summaries': 'Summaries',
   'budget.excess': 'Excess',
@@ -56,6 +58,11 @@ const en: Dictionary = {
   'budget.editRecurringBudget': 'Edit Recurring Budget',
   'budget.applyYourChangesTo': 'Apply your changes to:',
   'budget.entireSeries': 'Entire Series',
+  'budget.addItem': 'Add Item',
+  'budget.itemName': 'Item Name',
+  'budget.itemAmount': 'Item Amount',
+  'budget.amountTotal': 'Total Amount',
+  'budget.title': 'Budget Title',
 
   'category.name': 'Category name',
   'category.chooseIcon': 'Choose an icon',
@@ -152,6 +159,8 @@ const pt: Dictionary = {
   'common.title': 'Título',
   'common.notes': 'Observações',
   'common.category': 'Categoria',
+  'common.saveAndExit': 'Salvar & Sair',
+  'common.saveAndAddNew': 'Salvar & Adicionar Novo',
 
   'budget.summaries': 'Resumos',
   'budget.excess': 'Excesso',
@@ -178,6 +187,16 @@ const pt: Dictionary = {
   'budget.allRecurring': 'Todos Recorrentes',
   'budget.futureRecurring': 'Futuros Recorrentes',
   'budget.addBudget': 'Adicionar Orçamento',
+  'budget.deleteThisOnly': 'Delete This Only',
+  'budget.deleteAllRecurring': 'Delete all Recurring',
+  'budget.editRecurringBudget': 'Edit Recurring Budget',
+  'budget.applyYourChangesTo': 'Apply your changes to:',
+  'budget.entireSeries': 'Entire Series',
+  'budget.addItem': 'Add Item',
+  'budget.itemName': 'Item Name',
+  'budget.itemAmount': 'Item Amount',
+  'budget.amountTotal': 'Total Amount',
+  'budget.title': 'Título do Orçamento',
 
   'category.name': 'Nome da categoria',
 
@@ -261,8 +280,8 @@ const fr: Dictionary = {
   'settings.theme.darkDim': 'Sombre atténué',
   'settings.theme.darkGray': 'Gris sombre',
   'settings.theme.system': 'Système',
-  'common.close': 'Fermer', 'common.delete': 'Supprimer', 'common.cancel': 'Annuler', 'common.apply': 'Appliquer', 'common.all': 'Tous', 'common.save': 'Enregistrer', 'common.name': 'Nom', 'common.title': 'Titre', 'common.notes': 'Notes', 'common.category': 'Catégorie',
-  'budget.summaries': 'Résumés', 'budget.excess': 'Excédent', 'budget.historyTitle': 'Historique du budget', 'budget.plannedVsSpent': 'Prévu vs Dépensé', 'budget.plannedTotal': 'Total prévu', 'budget.spentTotal': 'Total dépensé', 'budget.amount': 'Montant', 'budget.addExpense': 'Ajouter une dépense', 'budget.filterByCategory': 'Filtrer par catégorie', 'budget.sortBudgets': 'Trier les budgets', 'budget.groupBudgets': 'Grouper les budgets', 'budget.deleteBudget': 'Supprimer le budget', 'budget.applyChangesTo': 'Appliquer les modifications à', 'budget.thisOccurrence': 'Cette occurrence', 'budget.allRecurring': 'Tous récurrents', 'budget.futureRecurring': 'Récurrents futurs', 'budget.addBudget': 'Ajouter un budget',
+  'common.close': 'Fermer', 'common.delete': 'Supprimer', 'common.cancel': 'Annuler', 'common.apply': 'Appliquer', 'common.all': 'Tous', 'common.save': 'Enregistrer', 'common.name': 'Nom', 'common.title': 'Titre', 'common.notes': 'Notes', 'common.category': 'Catégorie', 'common.saveAndExit': 'Enregistrer & Quitter', 'common.saveAndAddNew': 'Enregistrer & Ajouter',
+  'budget.summaries': 'Résumés', 'budget.excess': 'Excédent', 'budget.historyTitle': 'Historique du budget', 'budget.plannedVsSpent': 'Prévu vs Dépensé', 'budget.plannedTotal': 'Total prévu', 'budget.spentTotal': 'Total dépensé', 'budget.amount': 'Montant', 'budget.addExpense': 'Ajouter une dépense', 'budget.filterByCategory': 'Filtrer par catégorie', 'budget.sortBudgets': 'Trier les budgets', 'budget.groupBudgets': 'Grouper les budgets', 'budget.deleteBudget': 'Supprimer le budget', 'budget.applyChangesTo': 'Appliquer les modifications à', 'budget.thisOccurrence': 'Cette occurrence', 'budget.allRecurring': 'Tous récurrents', 'budget.futureRecurring': 'Récurrents futurs', 'budget.addBudget': 'Ajouter un budget', 'budget.title': 'Titre du Budget',
   'category.name': 'Nom de la catégorie',
   'loans.reset': 'Réinitialiser', 'loans.lodgeLoan': 'Enregistrer un prêt', 'loans.owedToMe': 'On me doit', 'loans.iOwe': 'Je dois', 'loans.paidToMe': 'Payé à moi', 'loans.paidByMe': 'Payé par moi', 'loans.repaid': 'Remboursé', 'loans.recovered': 'Récupéré', 'loans.totalPrincipal': 'Principal total', 'loans.totalBalance': 'Solde total', 'loans.noLoansYet': 'Pas encore de prêts', 'loans.recordPayment': 'Enregistrer un paiement', 'loans.amount': 'Montant', 'loans.date': 'Date', 'loans.filterLoans': 'Filtrer les prêts', 'loans.filterBy': 'Filtrer par', 'loans.none': 'Aucun', 'loans.borrower': 'Emprunteur', 'loans.lender': 'Prêteur', 'loans.selectBorrower': 'Sélectionner un emprunteur', 'loans.selectLender': 'Sélectionner un prêteur', 'loans.sortLoans': 'Trier les prêts', 'loans.by': 'Par', 'loans.direction': 'Direction', 'loans.asc': 'Asc', 'loans.desc': 'Desc', 'loans.groupLoans': 'Grouper les prêts', 'loans.groupBy': 'Grouper par', 'loans.type': 'Type', 'loans.deleteLoan': 'Supprimer le prêt', 'loans.deleteConfirm': 'Supprimer ce prêt ?', 'loans.balance': 'Solde', 'loans.principal': 'Principal', 'loans.historyTitle': 'Historique des prêts', 'loans.customDate': 'Date personnalisée', 'loans.filter': 'Filtrer', 'date.start': 'Début', 'date.end': 'Fin',
   'invoice.title': 'Relevé de prêt', 'invoice.type': 'Type', 'invoice.counterparty': 'Contrepartie', 'invoice.principal': 'Principal', 'invoice.balance': 'Solde', 'invoice.date': 'Date', 'invoice.notes': 'Notes', 'invoice.records': 'Enregistrements', 'invoice.print': 'Imprimer',
@@ -273,8 +292,8 @@ const fr: Dictionary = {
 
 const es: Dictionary = {
   'settings.title': 'Ajustes', 'settings.appearance': 'Apariencia', 'settings.language': 'Idioma', 'settings.currency': 'Moneda', 'settings.theme.light': 'Claro', 'settings.theme.dark': 'Oscuro', 'settings.theme.darkDim': 'Oscuro tenue', 'settings.theme.darkGray': 'Gris oscuro', 'settings.theme.system': 'Sistema',
-  'common.close': 'Cerrar', 'common.delete': 'Eliminar', 'common.cancel': 'Cancelar', 'common.apply': 'Aplicar', 'common.all': 'Todos', 'common.save': 'Guardar', 'common.name': 'Nombre', 'common.title': 'Título', 'common.notes': 'Notas', 'common.category': 'Categoría',
-  'budget.summaries': 'Resúmenes', 'budget.excess': 'Exceso', 'budget.historyTitle': 'Historial de presupuesto', 'budget.plannedVsSpent': 'Planificado vs Gastado', 'budget.plannedTotal': 'Total planificado', 'budget.spentTotal': 'Total gastado', 'budget.new': 'Nuevo Presupuesto', 'budget.edit': 'Editar Presupuesto', 'budget.date': 'Fecha', 'budget.category': 'Categoría', 'budget.selectCategory': 'Seleccionar categoría', 'budget.recurring': 'Recurrente', 'budget.recurringEnd': 'Fecha de fin recurrente (incluida)', 'budget.selectRecurringEnd': 'Seleccionar fecha de fin recurrente', 'budget.amount': 'Monto', 'budget.addExpense': 'Agregar gasto', 'budget.filterByCategory': 'Filtrar por categoría', 'budget.sortBudgets': 'Ordenar presupuestos', 'budget.groupBudgets': 'Agrupar presupuestos', 'budget.deleteBudget': 'Eliminar presupuesto', 'budget.applyChangesTo': 'Aplicar cambios a', 'budget.thisOccurrence': 'Esta ocurrencia', 'budget.allRecurring': 'Todos recurrentes', 'budget.futureRecurring': 'Recurrentes futuros', 'budget.addBudget': 'Agregar presupuesto',
+  'common.close': 'Cerrar', 'common.delete': 'Eliminar', 'common.cancel': 'Cancelar', 'common.apply': 'Aplicar', 'common.all': 'Todos', 'common.save': 'Guardar', 'common.name': 'Nombre', 'common.title': 'Título', 'common.notes': 'Notas', 'common.category': 'Categoría', 'common.saveAndExit': 'Guardar & Salir', 'common.saveAndAddNew': 'Guardar & Añadir Nuevo',
+  'budget.summaries': 'Resúmenes', 'budget.excess': 'Exceso', 'budget.historyTitle': 'Historial de presupuesto', 'budget.plannedVsSpent': 'Planificado vs Gastado', 'budget.plannedTotal': 'Total planificado', 'budget.spentTotal': 'Total gastado', 'budget.new': 'Nuevo Presupuesto', 'budget.edit': 'Editar Presupuesto', 'budget.date': 'Fecha', 'budget.category': 'Categoría', 'budget.selectCategory': 'Seleccionar categoría', 'budget.recurring': 'Recurrente', 'budget.recurringEnd': 'Fecha de fin recurrente (incluida)', 'budget.selectRecurringEnd': 'Seleccionar fecha de fin recurrente', 'budget.amount': 'Monto', 'budget.addExpense': 'Agregar gasto', 'budget.filterByCategory': 'Filtrar por categoría', 'budget.sortBudgets': 'Ordenar presupuestos', 'budget.groupBudgets': 'Agrupar presupuestos', 'budget.deleteBudget': 'Eliminar presupuesto', 'budget.applyChangesTo': 'Aplicar cambios a', 'budget.thisOccurrence': 'Esta ocurrencia', 'budget.allRecurring': 'Todos recurrentes', 'budget.futureRecurring': 'Recurrentes futuros', 'budget.addBudget': 'Agregar presupuesto', 'budget.title': 'Título del Presupuesto',
   'category.name': 'Nombre de la categoría',
   'loans.reset': 'Reiniciar', 'loans.lodgeLoan': 'Registrar préstamo', 'loans.owedToMe': 'Me deben', 'loans.iOwe': 'Debo', 'loans.paidToMe': 'Pagado a mí', 'loans.paidByMe': 'Pagado por mí', 'loans.repaid': 'Pagado', 'loans.recovered': 'Recuperado', 'loans.totalPrincipal': 'Principal total', 'loans.totalBalance': 'Saldo total', 'loans.noLoansYet': 'Aún no hay préstamos', 'loans.recordPayment': 'Registrar pago', 'loans.amount': 'Monto', 'loans.date': 'Fecha', 'loans.filterLoans': 'Filtrar préstamos', 'loans.filterBy': 'Filtrar por', 'loans.none': 'Ninguno', 'loans.borrower': 'Deudor', 'loans.lender': 'Acreedor', 'loans.selectBorrower': 'Seleccionar deudor', 'loans.selectLender': 'Seleccionar acreedor', 'loans.sortLoans': 'Ordenar préstamos', 'loans.by': 'Por', 'loans.direction': 'Dirección', 'loans.asc': 'Asc', 'loans.desc': 'Desc', 'loans.groupLoans': 'Agrupar préstamos', 'loans.groupBy': 'Agrupar por', 'loans.type': 'Tipo', 'loans.deleteLoan': 'Eliminar préstamo', 'loans.deleteConfirm': '¿Eliminar este préstamo?', 'loans.balance': 'Saldo', 'loans.principal': 'Principal', 'loans.historyTitle': 'Historial de préstamos', 'loans.customDate': 'Fecha personalizada', 'loans.filter': 'Filtrar', 'date.start': 'Inicio', 'date.end': 'Fin',
   'invoice.title': 'Estado de préstamo', 'invoice.type': 'Tipo', 'invoice.counterparty': 'Contraparte', 'invoice.principal': 'Principal', 'invoice.balance': 'Saldo', 'invoice.date': 'Fecha', 'invoice.notes': 'Notas', 'invoice.records': 'Registros', 'invoice.print': 'Imprimir',
@@ -285,8 +304,8 @@ const es: Dictionary = {
 
 const de: Dictionary = {
   'settings.title': 'Einstellungen', 'settings.appearance': 'Aussehen', 'settings.language': 'Sprache', 'settings.currency': 'Währung', 'settings.theme.light': 'Hell', 'settings.theme.dark': 'Dunkel', 'settings.theme.darkDim': 'Dunkel gedimmt', 'settings.theme.darkGray': 'Dunkelgrau', 'settings.theme.system': 'System',
-  'common.close': 'Schließen', 'common.delete': 'Löschen', 'common.cancel': 'Abbrechen', 'common.apply': 'Anwenden', 'common.all': 'Alle', 'common.save': 'Speichern', 'common.name': 'Name', 'common.title': 'Titel', 'common.notes': 'Notizen', 'common.category': 'Kategorie',
-  'budget.summaries': 'Zusammenfassungen', 'budget.excess': 'Überschuss', 'budget.historyTitle': 'Budgetverlauf', 'budget.plannedVsSpent': 'Geplant vs Ausgegeben', 'budget.plannedTotal': 'Gesamt geplant', 'budget.spentTotal': 'Gesamt ausgegeben', 'budget.amount': 'Betrag', 'budget.addExpense': 'Ausgabe hinzufügen', 'budget.filterByCategory': 'Nach Kategorie filtern', 'budget.sortBudgets': 'Budgets sortieren', 'budget.groupBudgets': 'Budgets gruppieren', 'budget.deleteBudget': 'Budget löschen', 'budget.applyChangesTo': 'Änderungen anwenden auf', 'budget.thisOccurrence': 'Diese Instanz', 'budget.allRecurring': 'Alle wiederkehrend', 'budget.futureRecurring': 'Zukünftige wiederkehrend', 'budget.addBudget': 'Budget hinzufügen',
+  'common.close': 'Schließen', 'common.delete': 'Löschen', 'common.cancel': 'Abbrechen', 'common.apply': 'Anwenden', 'common.all': 'Alle', 'common.save': 'Speichern', 'common.name': 'Name', 'common.title': 'Titel', 'common.notes': 'Notizen', 'common.category': 'Kategorie', 'common.saveAndExit': 'Speichern & Beenden', 'common.saveAndAddNew': 'Speichern & Neu',
+  'budget.summaries': 'Zusammenfassungen', 'budget.excess': 'Überschuss', 'budget.historyTitle': 'Budgetverlauf', 'budget.plannedVsSpent': 'Geplant vs Ausgegeben', 'budget.plannedTotal': 'Gesamt geplant', 'budget.spentTotal': 'Gesamt ausgegeben', 'budget.amount': 'Betrag', 'budget.addExpense': 'Ausgabe hinzufügen', 'budget.filterByCategory': 'Nach Kategorie filtern', 'budget.sortBudgets': 'Budgets sortieren', 'budget.groupBudgets': 'Budgets gruppieren', 'budget.deleteBudget': 'Budget löschen', 'budget.applyChangesTo': 'Änderungen anwenden auf', 'budget.thisOccurrence': 'Diese Instanz', 'budget.allRecurring': 'Alle wiederkehrend', 'budget.futureRecurring': 'Zukünftige wiederkehrend', 'budget.addBudget': 'Budget hinzufügen', 'budget.title': 'Budgettitel',
   'category.name': 'Kategoriename',
   'loans.reset': 'Zurücksetzen', 'loans.lodgeLoan': 'Darlehen erfassen', 'loans.owedToMe': 'Mir geschuldet', 'loans.iOwe': 'Ich schulde', 'loans.paidToMe': 'An mich gezahlt', 'loans.paidByMe': 'Von mir gezahlt', 'loans.repaid': 'Zurückgezahlt', 'loans.recovered': 'Eingetrieben', 'loans.totalPrincipal': 'Gesamt Hauptbetrag', 'loans.totalBalance': 'Gesamtsaldo', 'loans.noLoansYet': 'Noch keine Darlehen', 'loans.recordPayment': 'Zahlung erfassen', 'loans.amount': 'Betrag', 'loans.date': 'Datum', 'loans.filterLoans': 'Darlehen filtern', 'loans.filterBy': 'Filtern nach', 'loans.none': 'Keine', 'loans.borrower': 'Schuldner', 'loans.lender': 'Gläubiger', 'loans.selectBorrower': 'Schuldner wählen', 'loans.selectLender': 'Gläubiger wählen', 'loans.sortLoans': 'Darlehen sortieren', 'loans.by': 'Nach', 'loans.direction': 'Richtung', 'loans.asc': 'Auf', 'loans.desc': 'Ab', 'loans.groupLoans': 'Darlehen gruppieren', 'loans.groupBy': 'Gruppieren nach', 'loans.type': 'Typ', 'loans.deleteLoan': 'Darlehen löschen', 'loans.deleteConfirm': 'Dieses Darlehen löschen?', 'loans.balance': 'Saldo', 'loans.principal': 'Hauptbetrag', 'loans.historyTitle': 'Darlehensverlauf', 'loans.customDate': 'Benutzerdefiniertes Datum', 'loans.filter': 'Filtern', 'date.start': 'Start', 'date.end': 'Ende',
   'invoice.title': 'Darlehensauszug', 'invoice.type': 'Typ', 'invoice.counterparty': 'Gegenpartei', 'invoice.principal': 'Hauptbetrag', 'invoice.balance': 'Saldo', 'invoice.date': 'Datum', 'invoice.notes': 'Notizen', 'invoice.records': 'Einträge', 'invoice.print': 'Drucken',

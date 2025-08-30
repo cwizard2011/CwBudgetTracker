@@ -17,6 +17,7 @@ interface BudgetContextValue {
     dateISO?: string;
     recurringStopISO?: string;
     notes?: string;
+    items: { id: string; name: string; amount: number, isCompleted: boolean }[];
   }) => Promise<void>;
   updateSpent: (budgetId: string, amountDelta: number) => Promise<void>;
   updateBudget: (budgetId: string, updates: Partial<Budget>) => Promise<void>;
@@ -72,7 +73,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return `${y}-${m}`;
   }
 
-  const addBudget: BudgetContextValue['addBudget'] = async ({ title, amountPlanned, period, category, categoryIcon, recurring = 'none', anchorDateISO, dateISO, recurringStopISO, notes }) => {
+  const addBudget: BudgetContextValue['addBudget'] = async ({ title, amountPlanned, period, category, categoryIcon, recurring = 'none', anchorDateISO, dateISO, recurringStopISO, notes, items }) => {
     const now = Date.now();
     const baseId = uuid.v4().toString();
     const recurringGroupId = recurring && recurring !== 'none' ? baseId : undefined;
@@ -94,6 +95,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       dateISO,
       createdAt: now,
       updatedAt: now,
+      items,
     };
 
     let newItems: Budget[] = [baseBudget];

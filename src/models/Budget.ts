@@ -3,6 +3,7 @@ export interface Budget {
   title: string;
   amountPlanned: number;
   amountSpent: number;
+  items: { id: string; name: string; amount: number, isCompleted: boolean }[];
   /** ISO-8601 period identifier, e.g. "2025-08" for August 2025 */
   period: string;
   /** Specific calendar date for this budget (YYYY-MM-DD) */
