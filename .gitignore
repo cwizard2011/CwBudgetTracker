@@ -89,3 +89,4 @@ android/app/release.keystore
 android/app/google-services.json
 ios/**/GoogleService-Info.plist
 android/gradle.properties
+android/app/keystore.properties
