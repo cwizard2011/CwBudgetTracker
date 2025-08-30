@@ -4,6 +4,8 @@ import { Budget } from '../models/Budget';
 import { LocalStorage } from '../services/LocalStorage';
 import { syncService } from '../services/SyncService';
 
+const generateUniqueId = (baseId: string, dateISO: string) => `${baseId}-${dateISO}-${Math.random().toString(36).substr(2, 9)}`;
+
 interface BudgetContextValue {
   budgets: Budget[];
   addBudget: (input: {
@@ -35,11 +37,39 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [budgets, setBudgets] = useState<Budget[]>([]);
 
   useEffect(() => {
-    const load = async () => {
-      const stored = await LocalStorage.getBudgets();
-      setBudgets(stored);
+    const loadAndPatch = async () => {
+      try {
+        const stored = await LocalStorage.getBudgets();
+        const totalBudgets = stored.length;
+        const patchedBudgets = [];
+
+        for (let i = 0; i < totalBudgets; i++) {
+          const budget = stored[i];
+          const uniqueItems = new Set(budget.items.map(item => item.id));
+          const patchedItems = budget.items.map(item => {
+            let newId = item.id;
+            let attempts = 0;
+            while (uniqueItems.has(newId)) {
+              if (attempts > 100) { // Prevent infinite loop
+                break;
+              }
+              newId = generateUniqueId(item.id, budget.dateISO || 'unknown');
+              attempts++;
+            }
+            uniqueItems.add(newId);
+            return { ...item, id: newId };
+          });
+          patchedBudgets.push({ ...budget, items: patchedItems });
+          await new Promise(resolve => setTimeout(resolve, 0)); // Yield to UI
+        }
+
+        setBudgets(patchedBudgets);
+        await LocalStorage.saveBudgets(patchedBudgets);
+      } catch (error) {
+        console.error('Error during data patching:', error);
+      }
     };
-    load();
+    loadAndPatch();
   }, []);
 
   function addDays(date: Date, days: number) {
@@ -95,7 +125,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       dateISO,
       createdAt: now,
       updatedAt: now,
-      items,
+      items: items.map(item => ({ ...item, id: generateUniqueId(item.id, dateISO || 'unknown') })), // Ensure unique item IDs with fallback
     };
 
     let newItems: Budget[] = [baseBudget];

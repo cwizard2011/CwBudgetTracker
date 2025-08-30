@@ -102,23 +102,21 @@ export function BudgetScreen() {
     setExpandedBudgetId(prevId => (prevId === budgetId ? null : budgetId));
   };
 
-  const toggleItemCompletion = (itemId: string) => {
+  const toggleItemCompletion = (budgetId: string, itemId: string) => {
     const updatedBudgets = budgets.map((budget: any) => {
-      let budgetUpdated = false;
+      if (budget.id !== budgetId) return budget; // Only update the specific budget
+
       const updatedItems = (budget.items || []).map((item: any) => {
         if (item.id === itemId) {
           const isCompleted = !item.isCompleted;
-          budgetUpdated = true;
           return { ...item, isCompleted };
         }
         return item;
       });
-      if (budgetUpdated) {
-        const amountSpent = updatedItems.reduce((sum: number, item: any) => sum + (item.isCompleted ? item.amount : 0), 0);
-        updateBudget(budget.id, { items: updatedItems, amountSpent: Math.max(amountSpent, 0) }); // Persist the updated items and amountSpent
-        return { ...budget, items: updatedItems, amountSpent: Math.max(amountSpent, 0) };
-      }
-      return budget;
+
+      const amountSpent = updatedItems.reduce((sum: number, item: any) => sum + (item.isCompleted ? item.amount : 0), 0);
+      updateBudget(budget.id, { items: updatedItems, amountSpent: Math.max(amountSpent, 0) }); // Persist the updated items and amountSpent
+      return { ...budget, items: updatedItems, amountSpent: Math.max(amountSpent, 0) };
     });
     setBudgets(updatedBudgets);
   };
@@ -232,7 +230,7 @@ export function BudgetScreen() {
                     <View key={subItem.id} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
                       <CustomCheckbox
                         isChecked={subItem.isCompleted}
-                        onPress={() => toggleItemCompletion(subItem.id)}
+                        onPress={() => toggleItemCompletion(item.id, subItem.id)}
                         theme={theme} // Pass the current theme here
                       />
                       <Text style={{ flex: 1, marginLeft: 8, color: Colors.text, textDecorationLine: subItem.isCompleted ? 'line-through' : 'none' }} numberOfLines={1} ellipsizeMode="tail">{subItem.name}</Text>
