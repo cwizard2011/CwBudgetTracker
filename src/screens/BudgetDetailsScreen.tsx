@@ -83,7 +83,11 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
     if (!editing) return;
     await updateBudgetSingle(editing.id, pendingUpdates);
     setScopeModalVisible(false);
-    navigation.goBack();
+    if (saveAndExit) {
+      navigation.goBack(); // Ensure it exits to Budget list page
+    } else {
+      resetForm(); // Reset form for Save and Add New
+    }
   };
 
   const applySeries = async () => {
