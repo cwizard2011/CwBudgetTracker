@@ -174,6 +174,10 @@ export function BudgetScreen() {
           <Text style={{ color: Colors.text }}>{t('budget.spentTotal')}</Text>
           <Text style={{ color: Colors.text }}>{formatCurrency(monthTotals.spent, locale, currency)}</Text>
         </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+          <Text style={{ color: Colors.text }}>{t('budget.remainingTotal')}</Text>
+          <Text style={{ color: Colors.text }}>{formatCurrency(monthTotals.planned - monthTotals.spent, locale, currency)}</Text>
+        </View>
         {(() => {
           const totalExcess = filtered.reduce((sum: number, b: any) => {
             const over = (b.amountSpent || 0) - (b.amountPlanned || 0);

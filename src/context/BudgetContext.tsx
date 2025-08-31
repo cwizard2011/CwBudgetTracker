@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import uuid from 'react-native-uuid';
 import { Budget } from '../models/Budget';
@@ -39,32 +40,37 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     const loadAndPatch = async () => {
       try {
-        const stored = await LocalStorage.getBudgets();
-        const totalBudgets = stored.length;
-        const patchedBudgets = [];
-
-        for (let i = 0; i < totalBudgets; i++) {
-          const budget = stored[i];
-          const uniqueItems = new Set(budget.items.map(item => item.id));
-          const patchedItems = budget.items.map(item => {
-            let newId = item.id;
-            let attempts = 0;
-            while (uniqueItems.has(newId)) {
-              if (attempts > 100) { // Prevent infinite loop
-                break;
-              }
-              newId = generateUniqueId(item.id, budget.dateISO || 'unknown');
-              attempts++;
-            }
-            uniqueItems.add(newId);
-            return { ...item, id: newId };
-          });
-          patchedBudgets.push({ ...budget, items: patchedItems });
-          await new Promise(resolve => setTimeout(resolve, 0)); // Yield to UI
+        const backfillCompleted = await AsyncStorage.getItem('backfillCompleted');
+        if (backfillCompleted) {
+          console.log('Backfill already completed.');
+          return;
         }
+
+        const stored = await LocalStorage.getBudgets();
+        const patchedBudgets = stored.map(budget => {
+          if (budget.recurringGroupId) { // Check if part of a recurring series
+            const uniqueItems = new Set(budget.items.map(item => item.id));
+            const patchedItems = budget.items.map(item => {
+              let newId = item.id;
+              let attempts = 0;
+              while (uniqueItems.has(newId)) {
+                if (attempts > 100) { // Prevent infinite loop
+                  break;
+                }
+                newId = generateUniqueId(item.id, budget.dateISO || 'unknown');
+                attempts++;
+              }
+              uniqueItems.add(newId);
+              return { ...item, id: newId, parent_id: budget.id }; // Add parent_id
+            });
+            return { ...budget, items: patchedItems };
+          }
+          return budget;
+        });
 
         setBudgets(patchedBudgets);
         await LocalStorage.saveBudgets(patchedBudgets);
+        await AsyncStorage.setItem('backfillCompleted', 'true'); // Set the flag
       } catch (error) {
         console.error('Error during data patching:', error);
       }
@@ -125,7 +131,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       dateISO,
       createdAt: now,
       updatedAt: now,
-      items: items.map(item => ({ ...item, id: generateUniqueId(item.id, dateISO || 'unknown') })), // Ensure unique item IDs with fallback
+      items: items.map(item => ({ ...item, id: generateUniqueId(item.id, dateISO || 'unknown'), parent_id: baseId })), // Ensure unique item IDs and add parent_id
     };
 
     let newItems: Budget[] = [baseBudget];
@@ -255,6 +261,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
                 amountSpent: 0,
+                items: merged.items.map(item => ({ ...item, id: generateUniqueId(item.id, toISODate(cursor)), parent_id: merged.id })), // Ensure unique item IDs and add parent_id
               };
               newItems.push(occurrence);
             }
