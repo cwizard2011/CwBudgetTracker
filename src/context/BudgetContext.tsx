@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import uuid from 'react-native-uuid';
 import { Budget } from '../models/Budget';
@@ -38,44 +37,11 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [budgets, setBudgets] = useState<Budget[]>([]);
 
   useEffect(() => {
-    const loadAndPatch = async () => {
-      try {
-        const backfillCompleted = await AsyncStorage.getItem('backfillCompleted');
-        if (backfillCompleted) {
-          console.log('Backfill already completed.');
-          return;
-        }
-
-        const stored = await LocalStorage.getBudgets();
-        const patchedBudgets = stored.map(budget => {
-          if (budget.recurringGroupId) { // Check if part of a recurring series
-            const uniqueItems = new Set(budget.items.map(item => item.id));
-            const patchedItems = budget.items.map(item => {
-              let newId = item.id;
-              let attempts = 0;
-              while (uniqueItems.has(newId)) {
-                if (attempts > 100) { // Prevent infinite loop
-                  break;
-                }
-                newId = generateUniqueId(item.id, budget.dateISO || 'unknown');
-                attempts++;
-              }
-              uniqueItems.add(newId);
-              return { ...item, id: newId, parent_id: budget.id }; // Add parent_id
-            });
-            return { ...budget, items: patchedItems };
-          }
-          return budget;
-        });
-
-        setBudgets(patchedBudgets);
-        await LocalStorage.saveBudgets(patchedBudgets);
-        await AsyncStorage.setItem('backfillCompleted', 'true'); // Set the flag
-      } catch (error) {
-        console.error('Error during data patching:', error);
-      }
+    const load = async () => {
+      const stored = await LocalStorage.getBudgets();
+      setBudgets(stored);
     };
-    loadAndPatch();
+    load();
   }, []);
 
   function addDays(date: Date, days: number) {
@@ -108,6 +74,15 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const m = String(d.getMonth() + 1).padStart(2, '0');
     return `${y}-${m}`;
   }
+
+  const persistAndQueueBudgets = async (nextBudgets: Budget[]) => {
+    setBudgets(nextBudgets);
+    await LocalStorage.saveBudgets(nextBudgets);
+    // Enqueue mutation for synchronization
+    for (const budget of nextBudgets) {
+      await LocalStorage.enqueueMutation({ collection: 'budgets', type: 'update', payload: budget });
+    }
+  };
 
   const addBudget: BudgetContextValue['addBudget'] = async ({ title, amountPlanned, period, category, categoryIcon, recurring = 'none', anchorDateISO, dateISO, recurringStopISO, notes, items }) => {
     const now = Date.now();
@@ -179,13 +154,8 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     const next = [...budgets, ...newItems];
-    setBudgets(next);
-    await LocalStorage.saveBudgets(next);
-    // enqueue for sync
-    for (const item of newItems) {
-      await LocalStorage.enqueueMutation({ collection: 'budgets', type: 'create', payload: item });
-    }
-    syncService.start();
+    await persistAndQueueBudgets(next);
+    syncService.start(); // Start synchronization
   };
 
   /* Update amount spent */
