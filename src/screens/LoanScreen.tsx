@@ -13,6 +13,18 @@ import { formatCurrency } from '../utils/format';
 import { useI18n } from '../utils/i18n';
 import { navigate as rootNavigate } from '../utils/navigationRef';
 
+const toLocalISODate = (date: Date = new Date()) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+const parseLocalISODateToEpoch = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(n => parseInt(n, 10));
+  return new Date(y, (m || 1) - 1, d || 1).getTime();
+};
+
 export function LoanScreen({ navigation }: any) {
   const { loans, recordPayment, deleteLoan, counterparties } = useLoans();
   const { locale, currency } = useSettings();
@@ -23,7 +35,7 @@ export function LoanScreen({ navigation }: any) {
   const [payModalVisible, setPayModalVisible] = useState(false);
   const [payAmount, setPayAmount] = useState('');
   const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
-  const [payDateISO, setPayDateISO] = useState(new Date().toISOString().slice(0,10));
+  const [payDateISO, setPayDateISO] = useState(toLocalISODate());
   const [showPayDatePicker, setShowPayDatePicker] = useState(false);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [sortModalVisible, setSortModalVisible] = useState(false);
@@ -43,7 +55,7 @@ export function LoanScreen({ navigation }: any) {
   const openPayModal = (loanId: string) => {
     setSelectedLoanId(loanId);
     setPayAmount('');
-    setPayDateISO(new Date().toISOString().slice(0,10));
+    setPayDateISO(toLocalISODate());
     setPayModalVisible(true);
   };
 
@@ -63,8 +75,7 @@ export function LoanScreen({ navigation }: any) {
   const handleSavePayment = async () => {
     const amt = parseFloat(payAmount);
     if (!isNaN(amt) && amt > 0 && selectedLoanId) {
-      const [y,m,d] = payDateISO.split('-').map(n => parseInt(n,10));
-      const dt = new Date(y, (m||1)-1, d||1).getTime();
+      const dt = parseLocalISODateToEpoch(payDateISO);
       await recordPayment(selectedLoanId, amt, undefined, dt);
       setPayModalVisible(false);
     }

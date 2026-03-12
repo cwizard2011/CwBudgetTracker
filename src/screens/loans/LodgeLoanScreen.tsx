@@ -10,6 +10,18 @@ import { useSettings } from '../../context/SettingsContext';
 import { Colors } from '../../theme/colors';
 import { useI18n } from '../../utils/i18n';
 
+const toLocalISODate = (date: Date = new Date()) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+const parseLocalISODateToEpoch = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(n => parseInt(n, 10));
+  return new Date(y, (m || 1) - 1, d || 1).getTime();
+};
+
 export function LodgeLoanScreen({ navigation, route }: any) {
   const { addLoan, updateLoanBasic, counterparties, loans } = useLoans() as any;
   const editingLoan = route?.params?.loan as (undefined | { id: string; counterpartName: string; type: 'owedByMe'|'owedToMe'; principal: number; loanDate: number });
@@ -21,7 +33,7 @@ export function LodgeLoanScreen({ navigation, route }: any) {
   const [principal, setPrincipal] = useState(editingLoan ? String(editingLoan.principal || 0) : '');
   const [notes, setNotes] = useState('');
   const [saveCounterparty, setSaveCounterparty] = useState(true);
-  const [dateISO, setDateISO] = useState(editingLoan ? new Date(editingLoan.loanDate).toISOString().slice(0,10) : new Date().toISOString().slice(0,10));
+  const [dateISO, setDateISO] = useState(editingLoan ? toLocalISODate(new Date(editingLoan.loanDate)) : toLocalISODate());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [matchedNames, setMatchedNames] = useState<string[]>([]);
@@ -99,7 +111,7 @@ export function LodgeLoanScreen({ navigation, route }: any) {
 
   const onSave = async () => {
     if (!canSave) return;
-    const loanDate = new Date(dateISO).getTime();
+    const loanDate = parseLocalISODateToEpoch(dateISO);
     if (editingLoan) {
       // Edit basic fields (name, principal)
       const finalName = name.trim();
@@ -214,7 +226,7 @@ export function LodgeLoanScreen({ navigation, route }: any) {
 
       {/* Confirm Merge or New */}
       <PromptModal visible={confirmVisible} title={t('loans.editLoan')} onCancel={() => setConfirmVisible(false)} onConfirm={async () => {
-        const loanDate = new Date(dateISO).getTime();
+        const loanDate = parseLocalISODateToEpoch(dateISO);
         const amount = parseFloat(principal);
         if (selectedMatch !== 'new') {
           // Merge into existing by name

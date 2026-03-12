@@ -18,6 +18,12 @@ import { TopActions } from './components/TopActions';
 
 type AppTheme = 'light' | 'dark' | 'darkDim' | 'darkGray' | 'system';
 
+const getLocalYearMonth = (date: Date = new Date()) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  return `${y}-${m}`;
+};
+
 const CustomCheckbox = ({ isChecked, onPress, theme }: { isChecked: boolean; onPress: () => void; theme: AppTheme }) => {
   const isLightTheme = theme === 'light';
   const backgroundColor = isChecked ? (isLightTheme ? Colors.primary : Colors.accent) : 'transparent';
@@ -37,7 +43,7 @@ export function BudgetScreen() {
   const t = useI18n();
 
   const [budgets, setBudgets] = useState<any[]>(contextBudgets || []);
-  const [filterPeriod, setFilterPeriod] = useState(new Date().toISOString().slice(0, 7));
+  const [filterPeriod, setFilterPeriod] = useState(getLocalYearMonth());
   const [filterCategory, setFilterCategory] = useState<string | undefined>();
   const [groupBy, setGroupBy] = useState<'date' | 'category'>('date');
   const [sortKey, setSortKey] = useState<'date' | 'amount'>('date');

@@ -8,6 +8,22 @@ const KEY_COUNTERPARTIES = 'loan_counterparties';
 const KEY_PENDING_MUTATIONS = 'pending_mutations';
 const KEY_SETTINGS = 'settings';
 
+const isUtcMidnight = (date: Date) =>
+  date.getUTCHours() === 0
+  && date.getUTCMinutes() === 0
+  && date.getUTCSeconds() === 0
+  && date.getUTCMilliseconds() === 0;
+
+const normalizeDateOnlyEpoch = (value: number): number => {
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return value;
+  // Legacy date-only values were stored as UTC midnight; convert them to local midnight.
+  if (isUtcMidnight(date)) {
+    return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()).getTime();
+  }
+  return value;
+};
+
 export interface PendingMutation {
   collection: 'budgets' | 'loans';
   type: 'create' | 'update' | 'delete';
@@ -30,7 +46,11 @@ export class LocalStorage {
     const raw = await AsyncStorage.getItem(KEY_LOANS);
     const list: Loan[] = raw ? (JSON.parse(raw) as Loan[]) : [];
     // migration: ensure loanDate exists
-    return list.map(l => ({ ...l, loanDate: l.loanDate || l.createdAt }));
+    return list.map(l => ({
+      ...l,
+      loanDate: normalizeDateOnlyEpoch(l.loanDate || l.createdAt),
+      issuances: (l.issuances || []).map(i => ({ ...i, date: normalizeDateOnlyEpoch(i.date) })),
+    }));
   }
 
   static async saveLoans(loans: Loan[]) {

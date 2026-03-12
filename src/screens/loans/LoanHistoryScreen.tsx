@@ -12,6 +12,27 @@ import { useI18n } from '../../utils/i18n';
 
 type Period = 'weekly' | 'monthly' | 'quarterly' | 'annual';
 
+const parseLocalISODate = (iso?: string): Date | null => {
+  if (!iso) return null;
+  const [y, m, d] = iso.split('-').map(n => parseInt(n, 10));
+  const date = new Date(y, (m || 1) - 1, d || 1);
+  return isNaN(date.getTime()) ? null : date;
+};
+
+const startOfLocalDayMs = (iso: string) => {
+  const date = parseLocalISODate(iso);
+  if (!date) return NaN;
+  date.setHours(0, 0, 0, 0);
+  return date.getTime();
+};
+
+const endOfLocalDayMs = (iso: string) => {
+  const date = parseLocalISODate(iso);
+  if (!date) return NaN;
+  date.setHours(23, 59, 59, 999);
+  return date.getTime();
+};
+
 export function LoanHistoryScreen() {
   const { loans, counterparties } = useLoans() as any;
   const { locale, currency } = useSettings();
@@ -31,10 +52,10 @@ export function LoanHistoryScreen() {
   const itemsInRange = useMemo(() => {
     let list = loans.slice();
     if (useCustomRange && startISO && endISO) {
-      const start = new Date(startISO).getTime();
-      const end = new Date(endISO).getTime();
+      const start = startOfLocalDayMs(startISO);
+      const end = endOfLocalDayMs(endISO);
       list = list.filter((l: any) => {
-        const dt = new Date(l.loanDate || l.createdAt).getTime();
+        const dt = l.loanDate || l.createdAt;
         return dt >= start && dt <= end;
       });
     }
@@ -55,7 +76,9 @@ export function LoanHistoryScreen() {
 
   const { categories, owedToMeSeries, iOweSeries, paidToMeSeries, paidByMeSeries, totals } = useMemo(() => {
     if (useCustomRange && startISO && endISO) {
-      const label = `${new Date(startISO).toLocaleDateString(locale)} - ${new Date(endISO).toLocaleDateString(locale)}`;
+      const startDate = parseLocalISODate(startISO);
+      const endDate = parseLocalISODate(endISO);
+      const label = `${(startDate || new Date()).toLocaleDateString(locale)} - ${(endDate || new Date()).toLocaleDateString(locale)}`;
       const owed = itemsInRange.filter((l:any)=>l.type==='owedToMe').reduce((s:number,l:any)=>s+(l.principal||0),0);
       const owe = itemsInRange.filter((l:any)=>l.type==='owedByMe').reduce((s:number,l:any)=>s+(l.principal||0),0);
       const paidToMe = itemsInRange.filter((l:any)=>l.type==='owedToMe').reduce((s:number,l:any)=>s + (l.payments||[]).reduce((p:number,x:any)=>p+(x.amount||0),0), 0);
@@ -208,10 +231,10 @@ export function LoanHistoryScreen() {
           </View>
         </View>
         {showStart && (
-          <DateTimePicker value={startISO ? new Date(startISO) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowStart(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setStartISO(`${y}-${m}-${dd}`);} }} />
+          <DateTimePicker value={startISO ? (parseLocalISODate(startISO) || new Date()) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowStart(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setStartISO(`${y}-${m}-${dd}`);} }} />
         )}
         {showEnd && (
-          <DateTimePicker value={endISO ? new Date(endISO) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowEnd(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setEndISO(`${y}-${m}-${dd}`);} }} />
+          <DateTimePicker value={endISO ? (parseLocalISODate(endISO) || new Date()) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowEnd(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setEndISO(`${y}-${m}-${dd}`);} }} />
         )}
       </PromptModal>
     </ScrollView>

@@ -12,6 +12,19 @@ import { useSettings } from '../context/SettingsContext';
 import { Colors } from '../theme/colors';
 import { useI18n } from '../utils/i18n';
 
+const toLocalISODate = (date: Date = new Date()) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+const toLocalYearMonth = (date: Date = new Date()) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  return `${y}-${m}`;
+};
+
 export function BudgetDetailsScreen({ navigation, route }: any) {
   const { addBudget, updateBudget, updateBudgetSingle, updateBudgetSeries, updateBudgetFuture } = useBudgets() as any;
   const { categories, addCategory } = useCategories();
@@ -23,9 +36,9 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
   const [title, setTitle] = useState(editing?.title ?? '');
   const [amount, setAmount] = useState(editing ? String(editing.amountPlanned) : '');
   const [showCalc, setShowCalc] = useState(false);
-  const [period, setPeriod] = useState(editing?.period ?? new Date().toISOString().slice(0, 7));
+  const [period, setPeriod] = useState(editing?.period ?? toLocalYearMonth());
   const [notes, setNotes] = useState(editing?.notes ?? '');
-  const [dateISO, setDateISO] = useState<string>(editing?.dateISO ?? new Date().toISOString().slice(0,10));
+  const [dateISO, setDateISO] = useState<string>(editing?.dateISO ?? toLocalISODate());
   const [showDatePicker, setShowDatePicker] = useState(false);
   
   const dateObj = useMemo(() => {
@@ -45,8 +58,8 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
 
   const handleSave = async () => {
     if (!title || !amount) return;
-    const currentYM = new Date().toISOString().slice(0, 7);
-    const today = new Date().toISOString().slice(0,10);
+    const currentYM = toLocalYearMonth();
+    const today = toLocalISODate();
     if (!isEditing) {
       if (period < currentYM) return;
       if (dateISO < today) return;
@@ -116,8 +129,8 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
 
   const handleSaveAndAddNew = async () => {
     if (!title || !amount) return;
-    const currentYM = new Date().toISOString().slice(0, 7);
-    const today = new Date().toISOString().slice(0,10);
+    const currentYM = toLocalYearMonth();
+    const today = toLocalISODate();
     if (!isEditing) {
       if (period < currentYM) return;
       if (dateISO < today) return;
@@ -154,7 +167,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
     setCategoryIcon(undefined);
     setRecurring('none');
     setRecurringStopISO(undefined);
-    setDateISO(new Date().toISOString().slice(0,10));
+    setDateISO(toLocalISODate());
     setIsEditing(false);
   };
 
@@ -195,9 +208,9 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
   useEffect(() => {
     setTitle(editing?.title || '');
     setAmount(editing ? String(editing.amountPlanned) : '');
-    setPeriod(editing?.period || new Date().toISOString().slice(0, 7));
+    setPeriod(editing?.period || toLocalYearMonth());
     setNotes(editing?.notes || '');
-    setDateISO(editing?.dateISO || new Date().toISOString().slice(0,10));
+    setDateISO(editing?.dateISO || toLocalISODate());
     setCategory(editing?.category);
     setCategoryIcon(editing?.categoryIcon);
     setRecurring(editing?.recurring || 'none');
