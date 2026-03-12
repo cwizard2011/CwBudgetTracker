@@ -88,6 +88,19 @@ function buildSafetyPendingMutations(data: Record<string, string>): string | nul
   return JSON.stringify(pending);
 }
 
+function normalizeReadablePath(path: string): string {
+  let normalized = path.trim();
+  if (normalized.startsWith('file://')) {
+    normalized = normalized.replace('file://', '');
+  }
+  try {
+    normalized = decodeURI(normalized);
+  } catch {
+    // keep original when URI decoding fails
+  }
+  return normalized;
+}
+
 async function collectStorageData(): Promise<Record<string, string>> {
   const keys = await AsyncStorage.getAllKeys();
   if (!keys.length) return {};
@@ -146,12 +159,17 @@ export const backupService = {
     throw lastError || new Error('Failed to write backup file.');
   },
 
-  async restoreLatestBackup() {
-    const path = await findLatestBackupFilePath();
-    if (!path) {
-      throw new Error('No backup file found.');
+  async restoreFromPath(path: string) {
+    const normalizedPath = normalizeReadablePath(path);
+    if (!normalizedPath) {
+      throw new Error('No restore file selected.');
     }
-    const content = await RNFS.readFile(path, 'utf8');
+    const exists = await RNFS.exists(normalizedPath);
+    if (!exists) {
+      throw new Error('Selected restore file was not found.');
+    }
+
+    const content = await RNFS.readFile(normalizedPath, 'utf8');
     const parsed = JSON.parse(content) as unknown;
     const data = normalizeBackupData(parsed);
     const safetyPending = buildSafetyPendingMutations(data);
@@ -165,7 +183,15 @@ export const backupService = {
       await AsyncStorage.multiSet(entries);
     }
 
-    return { path, keysCount: entries.length };
+    return { path: normalizedPath, keysCount: entries.length };
+  },
+
+  async restoreLatestBackup() {
+    const path = await findLatestBackupFilePath();
+    if (!path) {
+      throw new Error('No backup file found.');
+    }
+    return this.restoreFromPath(path);
   },
 };
 
