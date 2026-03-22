@@ -34,6 +34,49 @@ const en: Dictionary = {
   'settings.backup.restartRequired': 'Please close and reopen the app to load restored data.',
   'settings.backup.unknownError': 'Unknown error',
 
+  'settings.googleDrive.title': 'Google Drive',
+  'settings.googleDrive.description':
+    'Backups go to your account’s hidden app data folder (only this app can access them). The first time you upload or restore, Google will ask you to sign in.',
+  'settings.googleDrive.backup': 'Upload to Drive',
+  'settings.googleDrive.backupBusy': 'Uploading…',
+  'settings.googleDrive.restore': 'Restore from Drive',
+  'settings.googleDrive.restoreBusy': 'Restoring…',
+  'settings.googleDrive.notConfiguredDebug':
+    'Set Web client IDs in src/config/googleDrive.ts (GOOGLE_OAUTH_WEB_CLIENT_ID_DEBUG / _PROD).',
+  'settings.googleDrive.notConfiguredRelease':
+    'Google Drive backup is not available in this build. Please update the app or use local backup.',
+  'settings.googleDrive.backupSuccess': 'Uploaded to Google Drive. Your previous cloud backup was replaced.',
+  'settings.googleDrive.restoreSuccess':
+    'Restored from Google Drive.\nPlease close and reopen the app to load restored data.',
+  'settings.googleDrive.noBackup': 'No backup file was found in your Google Drive app folder.',
+  'settings.googleDrive.cancelled': 'Google sign-in was cancelled.',
+  'settings.googleDrive.restoreWarning':
+    'This will replace all local data with the backup stored in your Google account.',
+  'settings.googleDrive.genericError': 'Something went wrong: {message}',
+  'settings.googleDrive.developerErrorDebug':
+    'Google Sign-In is not configured for this build (DEVELOPER_ERROR).\n\n' +
+    '1) Firebase Console → Project settings → Your apps → Android app with package com.cwbudgettracker.\n' +
+    '2) Add SHA-1 fingerprints: run in android/: ./gradlew :app:signingReport (use debug SHA for dev builds, release SHA for Play/App Signing).\n' +
+    '3) Ensure Google Sign-In uses the Web client ID in src/config/googleDrive.ts (not the Android client id).\n' +
+    '4) Enable Google Drive API for the Google Cloud project.\n\n' +
+    'Details: https://react-native-google-signin.github.io/docs/troubleshooting',
+  'settings.googleDrive.developerErrorRelease':
+    'Google sign-in could not be completed. Please try again, or use Create Backup above.',
+  'settings.googleDrive.accessDeniedDebug':
+    'Google returned 403 access_denied.\n\n' +
+    '• Use a **Web application** OAuth client ID in src/config/googleDrive.ts (not the Android client id).\n' +
+    '• OAuth consent screen: if status is **Testing**, add this Google account under **Test users**.\n' +
+    '• Or the user denied Drive access — try again and tap **Allow** for Google Drive.',
+  'settings.googleDrive.accessDeniedRelease':
+    'Sign-in was blocked or access was denied. Try again, or use local backup. Contact support if it continues.',
+  'settings.googleDrive.driveApiDisabledDebug':
+    'Google Drive API is disabled for the Google Cloud **project** that owns your Web OAuth client (the error text includes a project number).\n\n' +
+    '1) Open Google Cloud Console → select that project → APIs & Services → Library → search “Google Drive API” → **Enable**.\n' +
+    '2) Or: https://console.cloud.google.com/apis/library/drive.googleapis.com — pick the same project as your `webClientId` in src/config/googleDrive.ts.\n' +
+    '3) Wait a few minutes after enabling, then retry.',
+  'settings.googleDrive.driveApiDisabledRelease':
+    'Google Drive is temporarily unavailable. Try again in a few minutes, or use local backup.',
+
   'common.close': 'Close',
   'common.delete': 'Delete',
   'common.cancel': 'Cancel',

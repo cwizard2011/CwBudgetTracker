@@ -131,18 +131,43 @@ async function findLatestBackupFilePath(): Promise<string | null> {
   return files[0].path;
 }
 
-export const backupService = {
-  async createBackup() {
-    const data = await collectStorageData();
-    const payload: BackupPayloadV1 = {
-      schemaVersion: 1,
-      app: 'CwBudgetTracker',
-      createdAt: Date.now(),
-      data,
-    };
+async function buildBackupPayload(): Promise<{ content: string; fileName: string; keysCount: number }> {
+  const data = await collectStorageData();
+  const payload: BackupPayloadV1 = {
+    schemaVersion: 1,
+    app: 'CwBudgetTracker',
+    createdAt: Date.now(),
+    data,
+  };
+  const fileName = `${BACKUP_FILE_PREFIX}${formatTimestampForFile(new Date())}${BACKUP_FILE_EXT}`;
+  const content = JSON.stringify(payload, null, 2);
+  return { content, fileName, keysCount: Object.keys(data).length };
+}
 
-    const fileName = `${BACKUP_FILE_PREFIX}${formatTimestampForFile(new Date())}${BACKUP_FILE_EXT}`;
-    const content = JSON.stringify(payload, null, 2);
+async function applyRestoreFromParsedContent(content: string, resultLabel: string) {
+  const parsed = JSON.parse(content) as unknown;
+  const data = normalizeBackupData(parsed);
+  const safetyPending = buildSafetyPendingMutations(data);
+  if (safetyPending) {
+    data[KEY_PENDING_MUTATIONS] = safetyPending;
+  }
+  const entries = Object.entries(data);
+
+  await AsyncStorage.clear();
+  if (entries.length) {
+    await AsyncStorage.multiSet(entries);
+  }
+
+  return { path: resultLabel, keysCount: entries.length };
+}
+
+export const backupService = {
+  async createBackupPayload() {
+    return buildBackupPayload();
+  },
+
+  async createBackup() {
+    const { content, fileName, keysCount } = await buildBackupPayload();
     const dirs = backupDirectories();
     let lastError: unknown = null;
 
@@ -150,13 +175,17 @@ export const backupService = {
       const path = `${dir}/${fileName}`;
       try {
         await RNFS.writeFile(path, content, 'utf8');
-        return { path, keysCount: Object.keys(data).length };
+        return { path, keysCount };
       } catch (e) {
         lastError = e;
       }
     }
 
     throw lastError || new Error('Failed to write backup file.');
+  },
+
+  async restoreFromJsonContent(content: string, sourceLabel = 'Google Drive') {
+    return applyRestoreFromParsedContent(content, sourceLabel);
   },
 
   async restoreFromPath(path: string) {
@@ -170,20 +199,7 @@ export const backupService = {
     }
 
     const content = await RNFS.readFile(normalizedPath, 'utf8');
-    const parsed = JSON.parse(content) as unknown;
-    const data = normalizeBackupData(parsed);
-    const safetyPending = buildSafetyPendingMutations(data);
-    if (safetyPending) {
-      data[KEY_PENDING_MUTATIONS] = safetyPending;
-    }
-    const entries = Object.entries(data);
-
-    await AsyncStorage.clear();
-    if (entries.length) {
-      await AsyncStorage.multiSet(entries);
-    }
-
-    return { path: normalizedPath, keysCount: entries.length };
+    return applyRestoreFromParsedContent(content, normalizedPath);
   },
 
   async restoreLatestBackup() {

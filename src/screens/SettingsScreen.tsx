@@ -5,15 +5,22 @@ import { Button } from '../components/ui/Button';
 import { PromptModal } from '../components/ui/PromptModal';
 import { useSettings } from '../context/SettingsContext';
 import { backupService } from '../services/BackupService';
+import { googleDriveBackupService } from '../services/GoogleDriveBackupService';
 import { Colors } from '../theme/colors';
+import {
+  isGoogleDriveApiDisabledError,
+  isGoogleOAuthAccessDenied,
+  isGoogleSignInDeveloperError,
+} from '../utils/googleSignInErrors';
 import { useI18n } from '../utils/i18n';
 
 export function SettingsScreen() {
   const { theme, setTheme, locale, setLocale, currency, setCurrency } = useSettings();
   const t = useI18n();
   const [status, setStatus] = useState<string>('');
-  const [busy, setBusy] = useState<'backup' | 'pick' | 'restore' | null>(null);
+  const [busy, setBusy] = useState<'backup' | 'pick' | 'restore' | 'gdBackup' | 'gdRestore' | null>(null);
   const [confirmRestoreVisible, setConfirmRestoreVisible] = useState(false);
+  const [confirmDriveRestoreVisible, setConfirmDriveRestoreVisible] = useState(false);
   const [selectedRestorePath, setSelectedRestorePath] = useState<string>('');
 
   const handleCreateBackup = async () => {
@@ -58,6 +65,94 @@ export function SettingsScreen() {
       setStatus(t('settings.backup.pickFailed', { message }));
     } finally {
       setBusy(null);
+    }
+  };
+
+  const handleDriveBackup = async () => {
+    if (!googleDriveBackupService.isConfigured()) {
+      setStatus(
+        __DEV__ ? t('settings.googleDrive.notConfiguredDebug') : t('settings.googleDrive.notConfiguredRelease'),
+      );
+      return;
+    }
+    setBusy('gdBackup');
+    try {
+      await googleDriveBackupService.uploadBackup();
+      setStatus(t('settings.googleDrive.backupSuccess'));
+    } catch (error: any) {
+      const code = error?.code as string | undefined;
+      const msg = error?.message as string | undefined;
+      if (msg === 'GOOGLE_OAUTH_NOT_CONFIGURED') {
+        setStatus(
+          __DEV__ ? t('settings.googleDrive.notConfiguredDebug') : t('settings.googleDrive.notConfiguredRelease'),
+        );
+      } else if (msg === 'SIGN_IN_CANCELLED' || code === 'SIGN_IN_CANCELLED') {
+        setStatus(t('settings.googleDrive.cancelled'));
+      } else if (isGoogleOAuthAccessDenied(error)) {
+        setStatus(
+          __DEV__ ? t('settings.googleDrive.accessDeniedDebug') : t('settings.googleDrive.accessDeniedRelease'),
+        );
+      } else if (isGoogleDriveApiDisabledError(error)) {
+        setStatus(
+          __DEV__
+            ? t('settings.googleDrive.driveApiDisabledDebug')
+            : t('settings.googleDrive.driveApiDisabledRelease'),
+        );
+      } else if (isGoogleSignInDeveloperError(error)) {
+        setStatus(
+          __DEV__ ? t('settings.googleDrive.developerErrorDebug') : t('settings.googleDrive.developerErrorRelease'),
+        );
+      } else {
+        setStatus(t('settings.googleDrive.genericError', { message: msg || t('settings.backup.unknownError') }));
+      }
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleDriveRestoreConfirmed = async () => {
+    if (!googleDriveBackupService.isConfigured()) {
+      setStatus(
+        __DEV__ ? t('settings.googleDrive.notConfiguredDebug') : t('settings.googleDrive.notConfiguredRelease'),
+      );
+      setConfirmDriveRestoreVisible(false);
+      return;
+    }
+    setBusy('gdRestore');
+    try {
+      await googleDriveBackupService.restoreBackup();
+      setStatus(t('settings.googleDrive.restoreSuccess'));
+    } catch (error: any) {
+      const code = error?.code as string | undefined;
+      const msg = error?.message as string | undefined;
+      if (msg === 'GOOGLE_OAUTH_NOT_CONFIGURED') {
+        setStatus(
+          __DEV__ ? t('settings.googleDrive.notConfiguredDebug') : t('settings.googleDrive.notConfiguredRelease'),
+        );
+      } else if (msg === 'NO_CLOUD_BACKUP') {
+        setStatus(t('settings.googleDrive.noBackup'));
+      } else if (msg === 'SIGN_IN_CANCELLED' || code === 'SIGN_IN_CANCELLED') {
+        setStatus(t('settings.googleDrive.cancelled'));
+      } else if (isGoogleOAuthAccessDenied(error)) {
+        setStatus(
+          __DEV__ ? t('settings.googleDrive.accessDeniedDebug') : t('settings.googleDrive.accessDeniedRelease'),
+        );
+      } else if (isGoogleDriveApiDisabledError(error)) {
+        setStatus(
+          __DEV__
+            ? t('settings.googleDrive.driveApiDisabledDebug')
+            : t('settings.googleDrive.driveApiDisabledRelease'),
+        );
+      } else if (isGoogleSignInDeveloperError(error)) {
+        setStatus(
+          __DEV__ ? t('settings.googleDrive.developerErrorDebug') : t('settings.googleDrive.developerErrorRelease'),
+        );
+      } else {
+        setStatus(t('settings.googleDrive.genericError', { message: msg || t('settings.backup.unknownError') }));
+      }
+    } finally {
+      setBusy(null);
+      setConfirmDriveRestoreVisible(false);
     }
   };
 
@@ -150,6 +245,26 @@ export function SettingsScreen() {
           {t('settings.backup.selectedPath', { path: selectedRestorePath })}
         </Text>
       )}
+
+      <Text style={styles.section}>{t('settings.googleDrive.title')}</Text>
+      <Text style={styles.help}>{t('settings.googleDrive.description')}</Text>
+      <View style={styles.row}>
+        <Button
+          title={busy === 'gdBackup' ? t('settings.googleDrive.backupBusy') : t('settings.googleDrive.backup')}
+          onPress={handleDriveBackup}
+          variant="primary"
+          style={styles.mr}
+          disabled={busy !== null}
+        />
+        <Button
+          title={busy === 'gdRestore' ? t('settings.googleDrive.restoreBusy') : t('settings.googleDrive.restore')}
+          onPress={() => setConfirmDriveRestoreVisible(true)}
+          variant="warning"
+          style={styles.mr}
+          disabled={busy !== null}
+        />
+      </View>
+
       {!!status && (
         <Text selectable style={styles.status}>
           {status}
@@ -165,6 +280,17 @@ export function SettingsScreen() {
         cancelText={t('common.cancel')}
       >
         <Text style={{ color: Colors.text }}>{t('settings.backup.restoreWarning')}</Text>
+      </PromptModal>
+
+      <PromptModal
+        visible={confirmDriveRestoreVisible}
+        title={t('settings.googleDrive.restore')}
+        onCancel={() => setConfirmDriveRestoreVisible(false)}
+        onConfirm={handleDriveRestoreConfirmed}
+        confirmText={t('common.apply')}
+        cancelText={t('common.cancel')}
+      >
+        <Text style={{ color: Colors.text }}>{t('settings.googleDrive.restoreWarning')}</Text>
       </PromptModal>
     </ScrollView>
   );

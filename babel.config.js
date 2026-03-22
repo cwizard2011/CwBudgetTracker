@@ -3,8 +3,6 @@ module.exports = function (api) {
   const isProd = process.env.NODE_ENV === 'production';
   return {
     presets: ['module:@react-native/babel-preset'],
-    plugins: [
-      isProd && ['transform-remove-console', { exclude: ['error', 'warn'] }],
-    ].filter(Boolean),
+    plugins: [isProd && ['transform-remove-console', { exclude: ['error', 'warn'] }]].filter(Boolean),
   };
 };
