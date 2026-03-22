@@ -9,6 +9,7 @@ import { googleDriveBackupService } from '../services/GoogleDriveBackupService';
 import { Colors } from '../theme/colors';
 import {
   isGoogleDriveApiDisabledError,
+  isGoogleDriveStorageQuotaError,
   isGoogleOAuthAccessDenied,
   isGoogleSignInDeveloperError,
 } from '../utils/googleSignInErrors';
@@ -98,6 +99,8 @@ export function SettingsScreen() {
             ? t('settings.googleDrive.driveApiDisabledDebug')
             : t('settings.googleDrive.driveApiDisabledRelease'),
         );
+      } else if (isGoogleDriveStorageQuotaError(error)) {
+        setStatus(t('settings.googleDrive.storageQuotaExceeded'));
       } else if (isGoogleSignInDeveloperError(error)) {
         setStatus(
           __DEV__ ? t('settings.googleDrive.developerErrorDebug') : t('settings.googleDrive.developerErrorRelease'),
@@ -143,6 +146,8 @@ export function SettingsScreen() {
             ? t('settings.googleDrive.driveApiDisabledDebug')
             : t('settings.googleDrive.driveApiDisabledRelease'),
         );
+      } else if (isGoogleDriveStorageQuotaError(error)) {
+        setStatus(t('settings.googleDrive.storageQuotaExceeded'));
       } else if (isGoogleSignInDeveloperError(error)) {
         setStatus(
           __DEV__ ? t('settings.googleDrive.developerErrorDebug') : t('settings.googleDrive.developerErrorRelease'),

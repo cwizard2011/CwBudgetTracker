@@ -76,6 +76,8 @@ const en: Dictionary = {
     '3) Wait a few minutes after enabling, then retry.',
   'settings.googleDrive.driveApiDisabledRelease':
     'Google Drive is temporarily unavailable. Try again in a few minutes, or use local backup.',
+  'settings.googleDrive.storageQuotaExceeded':
+    'Your Google account doesn’t have enough storage to save this backup. Free up space in Google Drive (or other Google storage), then try again. You can still use Create Backup to save a file on this device.',
 
   'common.close': 'Close',
   'common.delete': 'Delete',

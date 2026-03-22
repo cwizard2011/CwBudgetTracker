@@ -27,3 +27,13 @@ export function isGoogleDriveApiDisabledError(error: unknown): boolean {
   }
   return false;
 }
+
+/** Drive returned 403/507 etc. because the user's Google storage quota is full (upload/update). */
+export function isGoogleDriveStorageQuotaError(error: unknown): boolean {
+  const msg = String((error as { message?: string })?.message ?? '');
+  if (/storageQuotaExceeded/i.test(msg)) return true;
+  if (/drive storage quota/i.test(msg)) return true;
+  if (/insufficient.*storage|storage.*full/i.test(msg)) return true;
+  if (/507/.test(msg) && /insufficient/i.test(msg)) return true;
+  return false;
+}

@@ -5,6 +5,43 @@ plugins {
     id "com.google.gms.google-services"
 }
 
+// Gradle / Android Studio often run without your shell PATH (nvm, fnm, mise), so `node` fails for bundling.
+// Priority: NODE_BINARY env → NODE_BINARY in android/gradle.properties → login-shell lookup → "node"
+def resolveNodeBinaryForReactNative() {
+    def n = System.getenv("NODE_BINARY")
+    if (n != null && !n.trim().isEmpty()) {
+        return n.trim()
+    }
+    n = project.findProperty("NODE_BINARY")?.toString()
+    if (n != null && !n.trim().isEmpty()) {
+        return n.trim()
+    }
+    def os = System.getProperty("os.name").toLowerCase()
+    try {
+        if (os.contains("windows")) {
+            def proc = ["cmd", "/c", "where node"].execute()
+            proc.waitFor()
+            if (proc.exitValue() == 0) {
+                def line = proc.text.trim().split(/\r?\n/)[0]
+                if (line != null && !line.isEmpty()) {
+                    return line.trim()
+                }
+            }
+        } else {
+            def proc = ["/bin/bash", "-l", "-c", "command -v node"].execute()
+            proc.waitFor()
+            if (proc.exitValue() == 0) {
+                def path = proc.text.trim()
+                if (!path.isEmpty()) {
+                    return path
+                }
+            }
+        }
+    } catch (Throwable ignored) {
+    }
+    return "node"
+}
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -28,7 +65,7 @@ react {
 
     /* Bundling */
     //   A list containing the node command and its flags. Default is just 'node'.
-    // nodeExecutableAndArgs = ["node"]
+    nodeExecutableAndArgs = [resolveNodeBinaryForReactNative()]
     //
     //   The command to run when bundling. By default is 'bundle'
     // bundleCommand = "ram-bundle"
@@ -99,8 +136,8 @@ android {
         applicationId "com.cwbudgettracker"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 9  // Increment this for each Play Store release
-        versionName "1.2.6"  // Use semantic versioning (major.minor.patch)
+        versionCode 10  // Increment this for each Play Store release
+        versionName "2.0.0"  // Use semantic versioning (major.minor.patch)
     }
     signingConfigs {
         debug {

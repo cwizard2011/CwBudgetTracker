@@ -86,9 +86,14 @@ async function getAccessToken(): Promise<string> {
 
 function formatDriveError(status: number, text: string): string {
   try {
-    const parsed = JSON.parse(text) as { error?: { message?: string; errors?: Array<{ message?: string }> } };
+    const parsed = JSON.parse(text) as {
+      error?: { message?: string; errors?: Array<{ message?: string; reason?: string }> };
+    };
     const msg = parsed?.error?.message || parsed?.error?.errors?.[0]?.message;
+    const reason = parsed?.error?.errors?.[0]?.reason;
+    if (msg && reason) return `${status}: ${msg} (${reason})`;
     if (msg) return `${status}: ${msg}`;
+    if (reason) return `${status}: ${reason}`;
   } catch {
     // ignore
   }

@@ -6,6 +6,8 @@ buildscript {
         targetSdkVersion = 35
         ndkVersion = "27.1.12297006"
         kotlinVersion = "2.1.20"
+        // So libraries (e.g. react-native-gesture-handler) don't need `node` on PATH during Gradle config
+        REACT_NATIVE_NODE_MODULES_DIR = new File(rootDir.parentFile, "node_modules/react-native").absolutePath
     }
     repositories {
         google()
