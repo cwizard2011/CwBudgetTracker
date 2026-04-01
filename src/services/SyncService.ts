@@ -63,9 +63,21 @@ class SyncService {
       ]);
       const budgets = budgetsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
       const loans = loansSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      // Safety: never wipe local data just because remote is empty.
+      // This can happen if Firestore is misconfigured, points at a new/empty project,
+      // or if the app is used without user scoping but remote collections are empty.
+      const [localBudgets, localLoans] = await Promise.all([
+        LocalStorage.getBudgets(),
+        LocalStorage.getLoans(),
+      ]);
+
+      const shouldApplyBudgets = budgets.length > 0 || localBudgets.length === 0;
+      const shouldApplyLoans = loans.length > 0 || localLoans.length === 0;
+
       await Promise.all([
-        LocalStorage.saveBudgets(budgets as any),
-        LocalStorage.saveLoans(loans as any),
+        shouldApplyBudgets ? LocalStorage.saveBudgets(budgets as any) : Promise.resolve(),
+        shouldApplyLoans ? LocalStorage.saveLoans(loans as any) : Promise.resolve(),
       ]);
     } catch (e) {
       console.warn('Pull remote failed', e);

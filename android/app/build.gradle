@@ -136,8 +136,8 @@ android {
         applicationId "com.cwbudgettracker"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 10  // Increment this for each Play Store release
-        versionName "2.0.0"  // Use semantic versioning (major.minor.patch)
+        versionCode 11  // Increment this for each Play Store release
+        versionName "2.0.1"  // Use semantic versioning (major.minor.patch)
     }
     signingConfigs {
         debug {
