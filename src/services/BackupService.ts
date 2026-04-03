@@ -5,7 +5,66 @@ const BACKUP_FILE_PREFIX = 'cwbudgettracker-backup-';
 const BACKUP_FILE_EXT = '.json';
 const KEY_BUDGETS = 'budgets';
 const KEY_LOANS = 'loans';
+const KEY_COUNTERPARTIES = 'loan_counterparties';
 const KEY_PENDING_MUTATIONS = 'pending_mutations';
+
+/** Parsed array length from backup `data`; `null` means missing key or not a JSON array. */
+function backedUpArrayLength(data: Record<string, string>, key: string): number | null {
+  if (!Object.prototype.hasOwnProperty.call(data, key)) {
+    return null;
+  }
+  const raw = data[key];
+  if (raw == null || raw === '') {
+    return null;
+  }
+  try {
+    const v = JSON.parse(raw) as unknown;
+    return Array.isArray(v) ? v.length : null;
+  } catch {
+    return null;
+  }
+}
+
+function existingStorageArrayCount(raw: string | null): number {
+  if (raw == null || raw === '') {
+    return 0;
+  }
+  try {
+    const v = JSON.parse(raw) as unknown;
+    return Array.isArray(v) ? v.length : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * If the backup has no budget/loan list (missing, invalid, or empty `[]`), keep the device's current data when it is non-empty.
+ */
+function mergePreserveBudgetsLoansFromDevice(
+  data: Record<string, string>,
+  existingBudgets: string | null,
+  existingLoans: string | null,
+  existingCounterparties: string | null,
+): void {
+  const backupBudgetLen = backedUpArrayLength(data, KEY_BUDGETS);
+  const backupLoanLen = backedUpArrayLength(data, KEY_LOANS);
+  const backupCpLen = backedUpArrayLength(data, KEY_COUNTERPARTIES);
+
+  const useBackupBudgets = backupBudgetLen != null && backupBudgetLen > 0;
+  const useBackupLoans = backupLoanLen != null && backupLoanLen > 0;
+
+  if (!useBackupBudgets && existingStorageArrayCount(existingBudgets) > 0 && existingBudgets != null) {
+    data[KEY_BUDGETS] = existingBudgets;
+  }
+  if (!useBackupLoans && existingStorageArrayCount(existingLoans) > 0 && existingLoans != null) {
+    data[KEY_LOANS] = existingLoans;
+  }
+
+  const useBackupCp = backupCpLen != null && backupCpLen > 0;
+  if (!useBackupCp && existingStorageArrayCount(existingCounterparties) > 0 && existingCounterparties != null) {
+    data[KEY_COUNTERPARTIES] = existingCounterparties;
+  }
+}
 
 interface BackupPayloadV1 {
   schemaVersion: 1;
@@ -33,6 +92,18 @@ function isBackupFilename(name: string): boolean {
   return name.startsWith(BACKUP_FILE_PREFIX) && name.endsWith(BACKUP_FILE_EXT);
 }
 
+/** AsyncStorage values must be strings; coerce parsed JSON objects so restore never drops keys like `loans`. */
+function coerceStorageString(value: unknown): string | null {
+  if (typeof value === 'string') return value;
+  if (value === undefined || value === null) return null;
+  try {
+    const s = JSON.stringify(value);
+    return typeof s === 'string' ? s : null;
+  } catch {
+    return null;
+  }
+}
+
 function normalizeBackupData(raw: unknown): Record<string, string> {
   if (!raw || typeof raw !== 'object') {
     throw new Error('Invalid backup format.');
@@ -41,14 +112,18 @@ function normalizeBackupData(raw: unknown): Record<string, string> {
   // Preferred structured payload
   const maybePayload = raw as Partial<BackupPayloadV1>;
   if (maybePayload.schemaVersion === 1 && maybePayload.app === 'CwBudgetTracker' && maybePayload.data && typeof maybePayload.data === 'object') {
-    const entries = Object.entries(maybePayload.data);
-    const valid = entries.filter(([, v]) => typeof v === 'string') as Array<[string, string]>;
+    const entries = Object.entries(maybePayload.data as Record<string, unknown>);
+    const valid = entries
+      .map(([k, v]) => [k, coerceStorageString(v)] as const)
+      .filter(([, v]) => v != null) as Array<[string, string]>;
     return Object.fromEntries(valid);
   }
 
   // Backward-compatible plain key/value object
   const entries = Object.entries(raw as Record<string, unknown>);
-  const valid = entries.filter(([, v]) => typeof v === 'string') as Array<[string, string]>;
+  const valid = entries
+    .map(([k, v]) => [k, coerceStorageString(v)] as const)
+    .filter(([, v]) => v != null) as Array<[string, string]>;
   if (!valid.length) {
     throw new Error('Backup file is empty or invalid.');
   }
@@ -147,6 +222,14 @@ async function buildBackupPayload(): Promise<{ content: string; fileName: string
 async function applyRestoreFromParsedContent(content: string, resultLabel: string) {
   const parsed = JSON.parse(content) as unknown;
   const data = normalizeBackupData(parsed);
+
+  const [existingBudgets, existingLoans, existingCounterparties] = await Promise.all([
+    AsyncStorage.getItem(KEY_BUDGETS),
+    AsyncStorage.getItem(KEY_LOANS),
+    AsyncStorage.getItem(KEY_COUNTERPARTIES),
+  ]);
+  mergePreserveBudgetsLoansFromDevice(data, existingBudgets, existingLoans, existingCounterparties);
+
   const safetyPending = buildSafetyPendingMutations(data);
   if (safetyPending) {
     data[KEY_PENDING_MUTATIONS] = safetyPending;

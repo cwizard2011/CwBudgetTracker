@@ -2,6 +2,33 @@ import NetInfo from '@react-native-community/netinfo';
 import firestore from '@react-native-firebase/firestore';
 import { LocalStorage } from './LocalStorage';
 
+/** Union local + remote by id so Firestore never wipes records that exist only on device (e.g. after backup restore). */
+function mergeRecordsById<T extends { id: string; createdAt?: number; updatedAt?: number }>(
+  local: T[],
+  remote: T[],
+): T[] {
+  const byId = new Map<string, T>();
+  for (const row of local) {
+    if (row && typeof row.id === 'string') {
+      byId.set(row.id, row);
+    }
+  }
+  for (const row of remote) {
+    if (!row || typeof row.id !== 'string') {
+      continue;
+    }
+    const prev = byId.get(row.id);
+    if (!prev) {
+      byId.set(row.id, row);
+      continue;
+    }
+    const tr = row.updatedAt ?? row.createdAt ?? 0;
+    const tl = prev.updatedAt ?? prev.createdAt ?? 0;
+    byId.set(row.id, tr >= tl ? row : prev);
+  }
+  return Array.from(byId.values());
+}
+
 class SyncService {
   private unsubscribeNetInfo: (() => void) | null = null;
   private syncing = false;
@@ -61,24 +88,29 @@ class SyncService {
         firestore().collection('budgets').get(),
         firestore().collection('loans').get(),
       ]);
-      const budgets = budgetsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-      const loans = loansSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const budgets = budgetsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Array<{
+        id: string;
+        createdAt?: number;
+        updatedAt?: number;
+      }>;
+      const loans = loansSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Array<{
+        id: string;
+        createdAt?: number;
+        updatedAt?: number;
+      }>;
 
-      // Safety: never wipe local data just because remote is empty.
-      // This can happen if Firestore is misconfigured, points at a new/empty project,
-      // or if the app is used without user scoping but remote collections are empty.
       const [localBudgets, localLoans] = await Promise.all([
         LocalStorage.getBudgets(),
         LocalStorage.getLoans(),
       ]);
 
-      const shouldApplyBudgets = budgets.length > 0 || localBudgets.length === 0;
-      const shouldApplyLoans = loans.length > 0 || localLoans.length === 0;
+      // Never replace local with an empty remote snapshot (misconfigured / new project).
+      const nextBudgets =
+        budgets.length === 0 && localBudgets.length > 0 ? localBudgets : mergeRecordsById(localBudgets, budgets as any);
+      const nextLoans =
+        loans.length === 0 && localLoans.length > 0 ? localLoans : mergeRecordsById(localLoans, loans as any);
 
-      await Promise.all([
-        shouldApplyBudgets ? LocalStorage.saveBudgets(budgets as any) : Promise.resolve(),
-        shouldApplyLoans ? LocalStorage.saveLoans(loans as any) : Promise.resolve(),
-      ]);
+      await Promise.all([LocalStorage.saveBudgets(nextBudgets as any), LocalStorage.saveLoans(nextLoans as any)]);
     } catch (e) {
       console.warn('Pull remote failed', e);
     }
