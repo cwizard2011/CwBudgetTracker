@@ -5,7 +5,9 @@ import { MonthPicker } from '../../components/ui/MonthPicker';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { useBudgets } from '../../context/BudgetContext';
 import { useCategories } from '../../context/CategoryContext';
+import { useCurrencyToggle } from '../../context/CurrencyContext';
 import { useSettings } from '../../context/SettingsContext';
+import { Budget } from '../../models/Budget';
 import { Colors } from '../../theme/colors';
 import { formatCurrency } from '../../utils/format';
 import { useI18n } from '../../utils/i18n';
@@ -26,7 +28,7 @@ const getLocalYearMonth = (date: Date = new Date()) => {
 
 const CustomCheckbox = ({ isChecked, onPress, theme }: { isChecked: boolean; onPress: () => void; theme: AppTheme }) => {
   const isLightTheme = theme === 'light';
-  const backgroundColor = isChecked ? (isLightTheme ? Colors.primary : Colors.accent) : 'transparent';
+  const backgroundColor = isChecked ? (isLightTheme ? Colors.primary : Colors.secondary) : 'transparent';
   const checkColor = isLightTheme ? Colors.white : Colors.text;
 
   return (
@@ -37,12 +39,13 @@ const CustomCheckbox = ({ isChecked, onPress, theme }: { isChecked: boolean; onP
 };
 
 export function BudgetScreen() {
-  const { budgets: contextBudgets, updateSpent, deleteBudgetSingle, deleteBudgetSeries, updateBudget } = useBudgets() as any;
+  const { budgets: contextBudgets, updateSpent, deleteBudgetSingle, deleteBudgetSeries, updateBudget } = useBudgets();
   const { categories } = useCategories();
   const { locale, currency, theme } = useSettings();
+  const { displayCurrency, convert, hasRates, toggle: toggleCurrency, primaryCurrency, secondaryCurrency, isOnPrimary } = useCurrencyToggle();
   const t = useI18n();
 
-  const [budgets, setBudgets] = useState<any[]>(contextBudgets || []);
+  const [budgets, setBudgets] = useState<Budget[]>(contextBudgets || []);
   const [filterPeriod, setFilterPeriod] = useState(getLocalYearMonth());
   const [filterCategory, setFilterCategory] = useState<string | undefined>();
   const [groupBy, setGroupBy] = useState<'date' | 'category'>('date');
@@ -65,11 +68,8 @@ export function BudgetScreen() {
   const defaultGroupBy: 'date' | 'category' = 'date';
 
   // Remove ID generation logic for budget items
-  const initializeBudgets = (budgets: any[]) => {
-    return budgets.map(budget => {
-      // Assume items already have IDs from add budget feature
-      return { ...budget, items: budget.items || [] };
-    });
+  const initializeBudgets = (raw: Budget[]): Budget[] => {
+    return raw.map(budget => ({ ...budget, items: budget.items || [] }));
   };
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export function BudgetScreen() {
   };
   const openDeleteModal = (budgetId: string) => {
     setSelectedBudgetId(budgetId);
-    const b = budgets.find((x: any) => x.id === budgetId);
+    const b = budgets.find(x => x.id === budgetId);
     const isRecurring = b && b.recurring && b.recurring !== 'none';
     if (isRecurring) setDeleteModalVisible(true);
     else setConfirmDeleteVisible(true);
@@ -109,38 +109,35 @@ export function BudgetScreen() {
   };
 
   const toggleItemCompletion = (budgetId: string, itemId: string) => {
-    const updatedBudgets = budgets.map((budget: any) => {
-      if (budget.id !== budgetId) return budget; // Only update the specific budget
+    const updatedBudgets = budgets.map(budget => {
+      if (budget.id !== budgetId) return budget;
 
-      const updatedItems = (budget.items || []).map((item: any) => {
-        if (item.id === itemId) {
-          const isCompleted = !item.isCompleted;
-          return { ...item, isCompleted };
-        }
+      const updatedItems = (budget.items || []).map(item => {
+        if (item.id === itemId) return { ...item, isCompleted: !item.isCompleted };
         return item;
       });
 
-      const amountSpent = updatedItems.reduce((sum: number, item: any) => sum + (item.isCompleted ? item.amount : 0), 0);
-      updateBudget(budget.id, { items: updatedItems, amountSpent: Math.max(amountSpent, 0) }); // Persist the updated items and amountSpent
+      const amountSpent = updatedItems.reduce((sum, item) => sum + (item.isCompleted ? item.amount : 0), 0);
+      updateBudget(budget.id, { items: updatedItems, amountSpent: Math.max(amountSpent, 0) });
       return { ...budget, items: updatedItems, amountSpent: Math.max(amountSpent, 0) };
     });
     setBudgets(updatedBudgets);
   };
 
-  const filtered = useMemo(() => budgets.filter((b: any) => b.period === filterPeriod && (!filterCategory || (b.category || 'Uncategorized') === filterCategory)), [budgets, filterPeriod, filterCategory]);
+  const filtered = useMemo(() => budgets.filter(b => b.period === filterPeriod && (!filterCategory || (b.category || 'Uncategorized') === filterCategory)), [budgets, filterPeriod, filterCategory]);
 
-  function dateKeyOf(b: any): string { return b.dateISO || `${b.period}-01`; }
-  function compareItems(a: any, b: any): number {
+  function dateKeyOf(b: Budget): string { return b.dateISO || `${b.period}-01`; }
+  function compareItems(a: Budget, b: Budget): number {
     const cmp = sortKey === 'date' ? dateKeyOf(a).localeCompare(dateKeyOf(b)) : (a.amountPlanned || 0) - (b.amountPlanned || 0);
     return sortDir === 'asc' ? cmp : -cmp;
   }
 
   const sections = useMemo(() => {
-    const map = new Map<string, typeof budgets>();
+    const map = new Map<string, Budget[]>();
     if (groupBy === 'category') {
-      filtered.forEach((b: any) => { const k = b.category || 'Uncategorized'; if (!map.has(k)) map.set(k, []); map.get(k)!.push(b); });
+      filtered.forEach(b => { const k = b.category || 'Uncategorized'; if (!map.has(k)) map.set(k, []); map.get(k)!.push(b); });
     } else {
-      filtered.forEach((b: any) => { const k = dateKeyOf(b); if (!map.has(k)) map.set(k, []); map.get(k)!.push(b); });
+      filtered.forEach(b => { const k = dateKeyOf(b); if (!map.has(k)) map.set(k, []); map.get(k)!.push(b); });
     }
     for (const [, arr] of map.entries()) arr.sort(compareItems);
     let entries = Array.from(map.entries());
@@ -150,8 +147,8 @@ export function BudgetScreen() {
   }, [filtered, groupBy, sortKey, sortDir, collapsed]);
 
   const monthTotals = useMemo(() => {
-    const planned = filtered.reduce((s: number, b: any) => s + (b.amountPlanned || 0), 0);
-    const spent = filtered.reduce((s: number, b: any) => s + (b.amountSpent || 0), 0);
+    const planned = filtered.reduce((s, b) => s + (b.amountPlanned || 0), 0);
+    const spent = filtered.reduce((s, b) => s + (b.amountSpent || 0), 0);
     return { planned, spent };
   }, [filtered]);
 
@@ -170,22 +167,36 @@ export function BudgetScreen() {
         <MonthPicker yearMonth={filterPeriod} onChange={setFilterPeriod} />
       </View>
 
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 4 }}>
+        <TouchableOpacity
+          onPress={toggleCurrency}
+          style={[styles.currencyToggle, { backgroundColor: Colors.surface, borderColor: Colors.border }]}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.currencyToggleOption, isOnPrimary && styles.currencyToggleActive, { color: isOnPrimary ? Colors.onPrimary : Colors.text, backgroundColor: isOnPrimary ? Colors.primary : 'transparent' }]}>{primaryCurrency}</Text>
+          <Text style={[styles.currencyToggleOption, !isOnPrimary && styles.currencyToggleActive, { color: !isOnPrimary ? Colors.onPrimary : Colors.text, backgroundColor: !isOnPrimary ? Colors.primary : 'transparent' }]}>{secondaryCurrency}</Text>
+        </TouchableOpacity>
+        {!isOnPrimary && !hasRates && (
+          <Text style={{ color: Colors.warning, marginLeft: 8, fontSize: 12 }}>{t('currency.noRatesShort')}</Text>
+        )}
+      </View>
+
       <View style={[styles.rowWrap, { marginTop: 12 }]}> 
         <Text style={{ fontWeight: '700', color: Colors.text }}>{t('budget.summaries')}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
           <Text style={{ color: Colors.text }}>{t('budget.plannedTotal')}</Text>
-          <Text style={{ color: Colors.text }}>{formatCurrency(monthTotals.planned, locale, currency)}</Text>
+          <Text style={{ color: Colors.text }}>{formatCurrency(convert(monthTotals.planned), locale, displayCurrency)}</Text>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
           <Text style={{ color: Colors.text }}>{t('budget.spentTotal')}</Text>
-          <Text style={{ color: Colors.text }}>{formatCurrency(monthTotals.spent, locale, currency)}</Text>
+          <Text style={{ color: Colors.text }}>{formatCurrency(convert(monthTotals.spent), locale, displayCurrency)}</Text>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
           <Text style={{ color: Colors.text }}>{t('budget.remainingTotal')}</Text>
-          <Text style={{ color: Colors.text }}>{formatCurrency(monthTotals.planned - monthTotals.spent, locale, currency)}</Text>
+          <Text style={{ color: Colors.text }}>{formatCurrency(convert(monthTotals.planned - monthTotals.spent), locale, displayCurrency)}</Text>
         </View>
         {(() => {
-          const totalExcess = filtered.reduce((sum: number, b: any) => {
+          const totalExcess = filtered.reduce((sum, b) => {
             const over = (b.amountSpent || 0) - (b.amountPlanned || 0);
             return sum + (over > 0 ? over : 0);
           }, 0);
@@ -193,7 +204,7 @@ export function BudgetScreen() {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
               <Text style={{ color: Colors.text, fontWeight: '700' }}>{t('budget.excess')}</Text>
               <Text style={{ color: totalExcess > 0 ? Colors.error : Colors.mutedText, fontWeight: '700' }}>
-                {formatCurrency(totalExcess, locale, currency)}
+                {formatCurrency(convert(totalExcess), locale, displayCurrency)}
               </Text>
             </View>
           );
@@ -232,7 +243,7 @@ export function BudgetScreen() {
                   )}
                 </View>
               </View>
-              <Text style={{ marginBottom: 6, color: Colors.text }}>{formatCurrency(item.amountSpent || 0, locale, currency)} / {formatCurrency(item.amountPlanned || 0, locale, currency)}</Text>
+              <Text style={{ marginBottom: 6, color: Colors.text }}>{formatCurrency(convert(item.amountSpent || 0), locale, displayCurrency)} / {formatCurrency(convert(item.amountPlanned || 0), locale, displayCurrency)}</Text>
               <ProgressBar progress={item.amountPlanned ? item.amountSpent / item.amountPlanned : 0} fillColor={Colors.success} />
               {expandedBudgetId === item.id && item.items && (
                 <View>
@@ -244,7 +255,7 @@ export function BudgetScreen() {
                         theme={theme} // Pass the current theme here
                       />
                       <Text style={{ flex: 1, marginLeft: 8, color: Colors.text, textDecorationLine: subItem.isCompleted ? 'line-through' : 'none' }} numberOfLines={1} ellipsizeMode="tail">{subItem.name}</Text>
-                      <Text style={{ marginLeft: 8, color: Colors.text, textDecorationLine: subItem.isCompleted ? 'line-through' : 'none' }}>{formatCurrency(subItem.amount, locale, currency)}</Text>
+                      <Text style={{ marginLeft: 8, color: Colors.text, textDecorationLine: subItem.isCompleted ? 'line-through' : 'none' }}>{formatCurrency(convert(subItem.amount), locale, displayCurrency)}</Text>
                     </View>
                   ))}
                 </View>
@@ -272,6 +283,9 @@ const styles = StyleSheet.create({
   item: { paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: Colors.border, flexDirection: 'row', justifyContent: 'space-between' },
   title: { fontWeight: '600', color: Colors.heading },
   sectionHeading: { fontWeight: '700', color: Colors.text },
+  currencyToggle: { flexDirection: 'row', borderWidth: 1, borderRadius: 20, overflow: 'hidden' },
+  currencyToggleOption: { paddingHorizontal: 14, paddingVertical: 5, fontSize: 13, fontWeight: '600' },
+  currencyToggleActive: { borderRadius: 20 },
 });
 
 

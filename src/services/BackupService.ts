@@ -1,12 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
+import { STORAGE_KEYS } from '../config/storageKeys';
 
 const BACKUP_FILE_PREFIX = 'cwbudgettracker-backup-';
 const BACKUP_FILE_EXT = '.json';
-const KEY_BUDGETS = 'budgets';
-const KEY_LOANS = 'loans';
-const KEY_COUNTERPARTIES = 'loan_counterparties';
-const KEY_PENDING_MUTATIONS = 'pending_mutations';
+const KEY_BUDGETS = STORAGE_KEYS.BUDGETS;
+const KEY_LOANS = STORAGE_KEYS.LOANS;
+const KEY_COUNTERPARTIES = STORAGE_KEYS.COUNTERPARTIES;
+const KEY_PENDING_MUTATIONS = STORAGE_KEYS.PENDING_MUTATIONS;
 
 /** Parsed array length from backup `data`; `null` means missing key or not a JSON array. */
 function backedUpArrayLength(data: Record<string, string>, key: string): number | null {
@@ -236,9 +237,31 @@ async function applyRestoreFromParsedContent(content: string, resultLabel: strin
   }
   const entries = Object.entries(data);
 
+  // Snapshot current storage so we can roll back if the write fails.
+  const allCurrentKeys = await AsyncStorage.getAllKeys();
+  const snapshot: [string, string][] = [];
+  if (allCurrentKeys.length > 0) {
+    const pairs = await AsyncStorage.multiGet(allCurrentKeys);
+    for (const [k, v] of pairs) {
+      if (typeof v === 'string') snapshot.push([k, v]);
+    }
+  }
+
   await AsyncStorage.clear();
-  if (entries.length) {
-    await AsyncStorage.multiSet(entries);
+  try {
+    if (entries.length) {
+      await AsyncStorage.multiSet(entries);
+    }
+  } catch (writeError) {
+    // Restore the snapshot so the user doesn't lose their data.
+    try {
+      if (snapshot.length > 0) {
+        await AsyncStorage.multiSet(snapshot);
+      }
+    } catch {
+      // Rollback also failed — nothing more we can do.
+    }
+    throw writeError;
   }
 
   return { path: resultLabel, keysCount: entries.length };

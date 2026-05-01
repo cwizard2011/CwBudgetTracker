@@ -231,10 +231,10 @@ export function LoanHistoryScreen() {
           </View>
         </View>
         {showStart && (
-          <DateTimePicker value={startISO ? (parseLocalISODate(startISO) || new Date()) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowStart(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setStartISO(`${y}-${m}-${dd}`);} }} />
+          <DateTimePicker value={startISO ? (parseLocalISODate(startISO) || new Date()) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowStart(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setStartISO(`${y}-${m}-${dd}`);} }} {...{} as any} />
         )}
         {showEnd && (
-          <DateTimePicker value={endISO ? (parseLocalISODate(endISO) || new Date()) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowEnd(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setEndISO(`${y}-${m}-${dd}`);} }} />
+          <DateTimePicker value={endISO ? (parseLocalISODate(endISO) || new Date()) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowEnd(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setEndISO(`${y}-${m}-${dd}`);} }} {...{} as any} />
         )}
       </PromptModal>
     </ScrollView>

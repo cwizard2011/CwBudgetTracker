@@ -262,7 +262,9 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             newItems.push(occurrence);
           }
         }
-      } catch {}
+      } catch (e) {
+        if (__DEV__) { console.error('[BudgetContext] addBudget recurring generation failed:', e); }
+      }
     }
 
     const next = [...budgets, ...newItems];
@@ -334,7 +336,9 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               newItems.push(occurrence);
             }
           }
-        } catch {}
+        } catch (e) {
+          if (__DEV__) { console.error('[BudgetContext] updateBudget recurring regeneration failed:', e); }
+        }
       }
 
       // Replace base and append regenerated items
@@ -453,7 +457,9 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               itemsToAppend.push(occ);
             }
           }
-        } catch {}
+        } catch (e) {
+          if (__DEV__) { console.error('[BudgetContext] updateBudgetFuture recurring regeneration failed:', e); }
+        }
       }
 
       const next = [...working, ...itemsToAppend];

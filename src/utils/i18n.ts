@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useSettings } from '../context/SettingsContext';
 
 type Dictionary = Record<string, string>;
@@ -36,7 +37,7 @@ const en: Dictionary = {
 
   'settings.googleDrive.title': 'Google Drive',
   'settings.googleDrive.description':
-    'Backups go to your account’s hidden app data folder (only this app can access them). The first time you upload or restore, Google will ask you to sign in.',
+    "Backups go to your account's hidden app data folder (only this app can access them). The first time you upload or restore, Google will ask you to sign in.",
   'settings.googleDrive.backup': 'Upload to Drive',
   'settings.googleDrive.backupBusy': 'Uploading…',
   'settings.googleDrive.restore': 'Restore from Drive',
@@ -77,7 +78,7 @@ const en: Dictionary = {
   'settings.googleDrive.driveApiDisabledRelease':
     'Google Drive is temporarily unavailable. Try again in a few minutes, or use local backup.',
   'settings.googleDrive.storageQuotaExceeded':
-    'Your Google account doesn’t have enough storage to save this backup. Free up space in Google Drive (or other Google storage), then try again. You can still use Create Backup to save a file on this device.',
+    "Your Google account doesn't have enough storage to save this backup. Free up space in Google Drive (or other Google storage), then try again. You can still use Create Backup to save a file on this device.",
 
   'common.close': 'Close',
   'common.delete': 'Delete',
@@ -200,9 +201,21 @@ const en: Dictionary = {
   'home.loans': 'Loans',
   'home.loanHistory': 'Loan payment history',
   'home.budgetHistory': 'Budget history',
+  'home.currencyConverter': 'Currency Converter',
   'home.settings': 'Settings',
   'home.footerDevelopedBy': 'Application developed by',
   'home.copyright': 'Copyright',
+
+  'settings.secondaryCurrency': 'Secondary Currency',
+  'settings.secondaryCurrencyHelp': 'Used for quick currency switching on Budget and Loan screens.',
+
+  'currency.converterTitle': 'Currency Converter',
+  'currency.from': 'From',
+  'currency.to': 'To',
+  'currency.openConverter': 'Open Currency Converter',
+  'currency.noRatesAvailable': 'No exchange rate data available. Connect to the internet to fetch rates.',
+  'currency.noRatesShort': 'No rates — connect to internet',
+  'currency.ratesAsOf': 'Rates as of {date}',
 };
 
 const pt: Dictionary = {
@@ -215,6 +228,38 @@ const pt: Dictionary = {
   'settings.theme.darkDim': 'Escuro Suave',
   'settings.theme.darkGray': 'Cinza Escuro',
   'settings.theme.system': 'Sistema',
+
+  'settings.backup.title': 'Backup e Restauração',
+  'settings.backup.description': 'Crie um arquivo de backup e copie-o para o novo telefone. Em seguida, use Selecionar Arquivo para navegar até o local e restaurá-lo.',
+  'settings.backup.create': 'Criar Backup',
+  'settings.backup.creating': 'Criando...',
+  'settings.backup.selectFile': 'Selecionar Arquivo de Restauração',
+  'settings.backup.picking': 'Selecionando...',
+  'settings.backup.restore': 'Restaurar Último Backup',
+  'settings.backup.restoreSelected': 'Restaurar Arquivo Selecionado',
+  'settings.backup.restoring': 'Restaurando...',
+  'settings.backup.noFileSelected': 'Por favor, selecione um arquivo de restauração primeiro.',
+  'settings.backup.success': 'Backup criado.\nCaminho: {path}\nChaves: {count}',
+  'settings.backup.failed': 'Falha no backup: {message}',
+  'settings.backup.restoreSuccess': 'Restauração concluída.\nOrigem: {path}\nChaves: {count}',
+  'settings.backup.restoreFailed': 'Falha na restauração: {message}',
+  'settings.backup.restoreWarning': 'Isso substituirá todos os dados locais pelo arquivo de backup mais recente encontrado neste dispositivo.',
+  'settings.backup.restartRequired': 'Por favor, feche e reabra o aplicativo para carregar os dados restaurados.',
+  'settings.backup.unknownError': 'Erro desconhecido',
+
+  'settings.googleDrive.title': 'Google Drive',
+  'settings.googleDrive.description': 'Os backups vão para a pasta oculta de dados do aplicativo da sua conta (apenas este aplicativo pode acessá-los).',
+  'settings.googleDrive.backup': 'Enviar para o Drive',
+  'settings.googleDrive.backupBusy': 'Enviando…',
+  'settings.googleDrive.restore': 'Restaurar do Drive',
+  'settings.googleDrive.restoreBusy': 'Restaurando…',
+  'settings.googleDrive.backupSuccess': 'Enviado para o Google Drive. O backup anterior na nuvem foi substituído.',
+  'settings.googleDrive.restoreSuccess': 'Restaurado do Google Drive.\nPor favor, feche e reabra o aplicativo para carregar os dados restaurados.',
+  'settings.googleDrive.noBackup': 'Nenhum arquivo de backup foi encontrado na pasta do aplicativo no Google Drive.',
+  'settings.googleDrive.cancelled': 'O login no Google foi cancelado.',
+  'settings.googleDrive.restoreWarning': 'Isso substituirá todos os dados locais pelo backup armazenado na sua conta do Google.',
+  'settings.googleDrive.genericError': 'Algo deu errado: {message}',
+  'settings.googleDrive.storageQuotaExceeded': 'Sua conta do Google não tem espaço suficiente para salvar este backup. Libere espaço no Google Drive e tente novamente.',
 
   'common.close': 'Fechar',
   'common.delete': 'Excluir',
@@ -254,15 +299,15 @@ const pt: Dictionary = {
   'budget.allRecurring': 'Todos Recorrentes',
   'budget.futureRecurring': 'Futuros Recorrentes',
   'budget.addBudget': 'Adicionar Orçamento',
-  'budget.deleteThisOnly': 'Delete This Only',
-  'budget.deleteAllRecurring': 'Delete all Recurring',
-  'budget.editRecurringBudget': 'Edit Recurring Budget',
-  'budget.applyYourChangesTo': 'Apply your changes to:',
-  'budget.entireSeries': 'Entire Series',
-  'budget.addItem': 'Add Item',
-  'budget.itemName': 'Item Name',
-  'budget.itemAmount': 'Item Amount',
-  'budget.amountTotal': 'Total Amount',
+  'budget.deleteThisOnly': 'Excluir Apenas Esta',
+  'budget.deleteAllRecurring': 'Excluir Todas Recorrentes',
+  'budget.editRecurringBudget': 'Editar Orçamento Recorrente',
+  'budget.applyYourChangesTo': 'Aplicar suas alterações a:',
+  'budget.entireSeries': 'Série Completa',
+  'budget.addItem': 'Adicionar Item',
+  'budget.itemName': 'Nome do Item',
+  'budget.itemAmount': 'Valor do Item',
+  'budget.amountTotal': 'Valor Total',
   'budget.title': 'Título do Orçamento',
   'budget.remainingTotal': 'Total de Orçamento Restante',
 
@@ -333,9 +378,21 @@ const pt: Dictionary = {
   'home.loans': 'Empréstimos',
   'home.loanHistory': 'Histórico de pagamentos',
   'home.budgetHistory': 'Histórico de orçamento',
+  'home.currencyConverter': 'Conversor de Moedas',
   'home.settings': 'Configurações',
   'home.footerDevelopedBy': 'Aplicativo desenvolvido por',
   'home.copyright': 'Copyright',
+
+  'settings.secondaryCurrency': 'Moeda Secundária',
+  'settings.secondaryCurrencyHelp': 'Usada para troca rápida de moeda nas telas de Orçamento e Empréstimos.',
+
+  'currency.converterTitle': 'Conversor de Moedas',
+  'currency.from': 'De',
+  'currency.to': 'Para',
+  'currency.openConverter': 'Abrir Conversor de Moedas',
+  'currency.noRatesAvailable': 'Dados de câmbio indisponíveis. Conecte-se à internet para obter as taxas.',
+  'currency.noRatesShort': 'Sem taxas — conecte à internet',
+  'currency.ratesAsOf': 'Taxas em {date}',
 };
 
 const fr: Dictionary = {
@@ -355,7 +412,9 @@ const fr: Dictionary = {
   'invoice.title': 'Relevé de prêt', 'invoice.type': 'Type', 'invoice.counterparty': 'Contrepartie', 'invoice.principal': 'Principal', 'invoice.balance': 'Solde', 'invoice.date': 'Date', 'invoice.notes': 'Notes', 'invoice.records': 'Enregistrements', 'invoice.print': 'Imprimer',
   'records.loan': 'Prêt', 'records.payment': 'Paiement', 'records.none': 'Aucun enregistrement',
   'period.weekly': 'Hebdomadaire', 'period.monthly': 'Mensuel', 'period.quarterly': 'Trimestriel', 'period.annual': 'Annuel',
-  'home.welcome': 'Bienvenue', 'home.budget': 'Budget', 'home.loans': 'Prêts', 'home.loanHistory': 'Historique des paiements', 'home.budgetHistory': 'Historique du budget', 'home.settings': 'Paramètres', 'home.footerDevelopedBy': 'Application développée par', 'home.copyright': 'Droits d\’auteur',
+  'home.welcome': 'Bienvenue', 'home.budget': 'Budget', 'home.loans': 'Prêts', 'home.loanHistory': 'Historique des paiements', 'home.budgetHistory': 'Historique du budget', 'home.currencyConverter': 'Convertisseur de devises', 'home.settings': 'Paramètres', 'home.footerDevelopedBy': 'Application développée par', 'home.copyright': 'Droits d\'auteur',
+  'settings.secondaryCurrency': 'Devise secondaire', 'settings.secondaryCurrencyHelp': 'Utilisée pour changer rapidement de devise sur les écrans Budget et Prêts.',
+  'currency.converterTitle': 'Convertisseur de devises', 'currency.from': 'De', 'currency.to': 'Vers', 'currency.openConverter': 'Ouvrir le convertisseur', 'currency.noRatesAvailable': 'Données de change indisponibles. Connectez-vous à Internet.', 'currency.noRatesShort': 'Pas de taux — connectez-vous', 'currency.ratesAsOf': 'Taux au {date}',
 };
 
 const es: Dictionary = {
@@ -367,7 +426,9 @@ const es: Dictionary = {
   'invoice.title': 'Estado de préstamo', 'invoice.type': 'Tipo', 'invoice.counterparty': 'Contraparte', 'invoice.principal': 'Principal', 'invoice.balance': 'Saldo', 'invoice.date': 'Fecha', 'invoice.notes': 'Notas', 'invoice.records': 'Registros', 'invoice.print': 'Imprimir',
   'records.loan': 'Préstamo', 'records.payment': 'Pago', 'records.none': 'Sin registros',
   'period.weekly': 'Semanal', 'period.monthly': 'Mensual', 'period.quarterly': 'Trimestral', 'period.annual': 'Anual',
-  'home.welcome': 'Bienvenido', 'home.budget': 'Presupuesto', 'home.loans': 'Préstamos', 'home.loanHistory': 'Historial de pagos', 'home.budgetHistory': 'Historial de presupuesto', 'home.settings': 'Ajustes', 'home.footerDevelopedBy': 'Aplicación desarrollada por', 'home.copyright': 'Derechos de autor',
+  'home.welcome': 'Bienvenido', 'home.budget': 'Presupuesto', 'home.loans': 'Préstamos', 'home.loanHistory': 'Historial de pagos', 'home.budgetHistory': 'Historial de presupuesto', 'home.currencyConverter': 'Conversor de divisas', 'home.settings': 'Ajustes', 'home.footerDevelopedBy': 'Aplicación desarrollada por', 'home.copyright': 'Derechos de autor',
+  'settings.secondaryCurrency': 'Moneda secundaria', 'settings.secondaryCurrencyHelp': 'Usada para cambio rápido de moneda en las pantallas de Presupuesto y Préstamos.',
+  'currency.converterTitle': 'Conversor de divisas', 'currency.from': 'De', 'currency.to': 'A', 'currency.openConverter': 'Abrir conversor', 'currency.noRatesAvailable': 'Datos de cambio no disponibles. Conéctese a Internet.', 'currency.noRatesShort': 'Sin tasas — conéctese', 'currency.ratesAsOf': 'Tasas al {date}',
 };
 
 const de: Dictionary = {
@@ -379,7 +440,9 @@ const de: Dictionary = {
   'invoice.title': 'Darlehensauszug', 'invoice.type': 'Typ', 'invoice.counterparty': 'Gegenpartei', 'invoice.principal': 'Hauptbetrag', 'invoice.balance': 'Saldo', 'invoice.date': 'Datum', 'invoice.notes': 'Notizen', 'invoice.records': 'Einträge', 'invoice.print': 'Drucken',
   'records.loan': 'Darlehen', 'records.payment': 'Zahlung', 'records.none': 'Keine Einträge',
   'period.weekly': 'Wöchentlich', 'period.monthly': 'Monatlich', 'period.quarterly': 'Vierteljährlich', 'period.annual': 'Jährlich',
-  'home.welcome': 'Willkommen', 'home.budget': 'Budget', 'home.loans': 'Darlehen', 'home.loanHistory': 'Zahlungsverlauf', 'home.budgetHistory': 'Budgetverlauf', 'home.settings': 'Einstellungen', 'home.footerDevelopedBy': 'Anwendung entwickelt von', 'home.copyright': 'Urheberrecht',
+  'home.welcome': 'Willkommen', 'home.budget': 'Budget', 'home.loans': 'Darlehen', 'home.loanHistory': 'Zahlungsverlauf', 'home.budgetHistory': 'Budgetverlauf', 'home.currencyConverter': 'Währungsrechner', 'home.settings': 'Einstellungen', 'home.footerDevelopedBy': 'Anwendung entwickelt von', 'home.copyright': 'Urheberrecht',
+  'settings.secondaryCurrency': 'Nebenwährung', 'settings.secondaryCurrencyHelp': 'Für schnellen Währungswechsel in Budget- und Darlehensansichten.',
+  'currency.converterTitle': 'Währungsrechner', 'currency.from': 'Von', 'currency.to': 'Nach', 'currency.openConverter': 'Währungsrechner öffnen', 'currency.noRatesAvailable': 'Keine Wechselkursdaten. Mit Internet verbinden.', 'currency.noRatesShort': 'Keine Kurse — verbinden', 'currency.ratesAsOf': 'Kurse vom {date}',
 };
 
 const dictionaries: Record<string, Dictionary> = { en, pt, fr, es, de };
@@ -403,7 +466,10 @@ export function translate(locale: string, key: string, params?: Record<string, s
 
 export function useI18n() {
   const { locale } = useSettings();
-  return (key: string, params?: Record<string, string | number>) => translate(locale, key, params);
+  return useCallback(
+    (key: string, params?: Record<string, string | number>) => translate(locale, key, params),
+    [locale],
+  );
 }
 
 

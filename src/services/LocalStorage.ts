@@ -1,12 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Budget } from '../models/Budget';
 import { Loan, LoanCounterparty } from '../models/Loan';
+import { STORAGE_KEYS } from '../config/storageKeys';
 
-const KEY_BUDGETS = 'budgets';
-const KEY_LOANS = 'loans';
-const KEY_COUNTERPARTIES = 'loan_counterparties';
-const KEY_PENDING_MUTATIONS = 'pending_mutations';
-const KEY_SETTINGS = 'settings';
+const KEY_BUDGETS = STORAGE_KEYS.BUDGETS;
+const KEY_LOANS = STORAGE_KEYS.LOANS;
+const KEY_COUNTERPARTIES = STORAGE_KEYS.COUNTERPARTIES;
+const KEY_PENDING_MUTATIONS = STORAGE_KEYS.PENDING_MUTATIONS;
+const KEY_SETTINGS = STORAGE_KEYS.SETTINGS;
 
 const isUtcMidnight = (date: Date) =>
   date.getUTCHours() === 0
@@ -84,12 +85,12 @@ export class LocalStorage {
   }
 
   /* Settings */
-  static async getSettings(): Promise<{ theme: 'light'|'dark'|'darkDim'|'darkGray'|'system'; locale: string; currency: string } | null> {
+  static async getSettings(): Promise<{ theme: 'light'|'dark'|'darkDim'|'darkGray'|'system'; locale: string; currency: string; secondaryCurrency?: string } | null> {
     const raw = await AsyncStorage.getItem(KEY_SETTINGS);
     return raw ? JSON.parse(raw) : null;
   }
 
-  static async saveSettings(value: { theme: 'light'|'dark'|'darkDim'|'darkGray'|'system'; locale: string; currency: string }) {
+  static async saveSettings(value: { theme: 'light'|'dark'|'darkDim'|'darkGray'|'system'; locale: string; currency: string; secondaryCurrency?: string }) {
     await AsyncStorage.setItem(KEY_SETTINGS, JSON.stringify(value));
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { errorCodes, isErrorWithCode, keepLocalCopy, pick, types } from '@react-native-documents/picker';
 import { Button } from '../components/ui/Button';
 import { PromptModal } from '../components/ui/PromptModal';
@@ -14,9 +14,12 @@ import {
   isGoogleSignInDeveloperError,
 } from '../utils/googleSignInErrors';
 import { useI18n } from '../utils/i18n';
+import { navigate as rootNavigate } from '../utils/navigationRef';
+
+const ALL_CURRENCIES = ['USD', 'EUR', 'GBP', 'NGN', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'BRL', 'MXN', 'KES', 'ZAR', 'GHS', 'EGP', 'SAR', 'AED', 'SGD', 'HKD'];
 
 export function SettingsScreen() {
-  const { theme, setTheme, locale, setLocale, currency, setCurrency } = useSettings();
+  const { theme, setTheme, locale, setLocale, currency, setCurrency, secondaryCurrency, setSecondaryCurrency } = useSettings();
   const t = useI18n();
   const [status, setStatus] = useState<string>('');
   const [busy, setBusy] = useState<'backup' | 'pick' | 'restore' | 'gdBackup' | 'gdRestore' | null>(null);
@@ -191,6 +194,7 @@ export function SettingsScreen() {
     mr: { marginRight: 8, marginBottom: 8 },
     help: { color: Colors.mutedText, marginBottom: 10, lineHeight: 20 },
     status: { color: Colors.text, marginTop: 10 },
+    converterLink: { borderRadius: 10, paddingVertical: 14, alignItems: 'center', marginTop: 4, marginBottom: 8 },
   });
 
   return (
@@ -215,10 +219,26 @@ export function SettingsScreen() {
 
       <Text style={styles.section}>{t('settings.currency')}</Text>
       <View style={styles.row}>
-        {['USD','EUR','GBP','NGN','JPY'].map(c => (
+        {ALL_CURRENCIES.map(c => (
           <Button key={c} title={c} variant={currency === c ? 'primary' : 'neutral'} onPress={() => setCurrency(c)} style={styles.mr} />
         ))}
       </View>
+
+      <Text style={styles.section}>{t('settings.secondaryCurrency')}</Text>
+      <Text style={styles.help}>{t('settings.secondaryCurrencyHelp')}</Text>
+      <View style={styles.row}>
+        {ALL_CURRENCIES.map(c => (
+          <Button key={c} title={c} variant={secondaryCurrency === c ? 'secondary' : 'neutral'} onPress={() => setSecondaryCurrency(c)} style={styles.mr} />
+        ))}
+      </View>
+
+      <TouchableOpacity
+        style={[styles.converterLink, { backgroundColor: Colors.primary }]}
+        onPress={() => rootNavigate('CurrencyConverter')}
+        activeOpacity={0.8}
+      >
+        <Text style={{ color: Colors.onPrimary, fontWeight: '700', fontSize: 15 }}>{t('currency.openConverter')}</Text>
+      </TouchableOpacity>
 
       <Text style={styles.section}>{t('settings.backup.title')}</Text>
       <Text style={styles.help}>{t('settings.backup.description')}</Text>

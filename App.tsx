@@ -12,9 +12,12 @@ import React, { useEffect } from 'react';
 import { StatusBar, useColorScheme } from 'react-native';
 import { BudgetProvider } from './src/context/BudgetContext';
 import { CategoryProvider } from './src/context/CategoryContext';
+import { CurrencyProvider } from './src/context/CurrencyContext';
 import { LoanProvider } from './src/context/LoanContext';
 import { SettingsProvider, useSettings } from './src/context/SettingsContext';
 import { BudgetDetailsScreen, BudgetHistoryScreen, BudgetScreen, CategoryPickerScreen, HomeScreen, LoanHistoryScreen, LoanInvoiceScreen, LoanScreen, LodgeLoanScreen, RecurringPickerScreen, SectionsScreen } from './src/screens';
+import { CurrencyConverterScreen } from './src/screens/CurrencyConverterScreen';
+import { currencyService } from './src/services/CurrencyService';
 import { syncService } from './src/services/SyncService';
 import { applyTheme } from './src/theme/colors';
 import { navigationRef } from './src/utils/navigationRef';
@@ -31,13 +34,15 @@ function InnerApp() {
 
   useEffect(() => {
     syncService.start();
-    return () => syncService.stop();
+    currencyService.initAndSchedule();
+    return () => { syncService.stop(); currencyService.stop(); };
   }, []);
 
   return (
     <LoanProvider>
       <BudgetProvider>
       <CategoryProvider>
+      <CurrencyProvider>
       <NavigationContainer ref={navigationRef}>
         <StatusBar barStyle={(resolved === true) ? 'light-content' : 'dark-content'} />
         <Stack.Navigator>
@@ -50,6 +55,7 @@ function InnerApp() {
           <Stack.Screen name="LoanInvoice" component={LoanInvoiceScreen} options={{ title: 'Invoice' }} />
           <Stack.Screen name="BudgetHistory" component={BudgetHistoryScreen} options={{ title: 'Budget History' }} />
           <Stack.Screen name="LoanHistory" component={LoanHistoryScreen} options={{ title: 'Loan History' }} />
+          <Stack.Screen name="CurrencyConverter" component={CurrencyConverterScreen} options={{ title: 'Currency Converter' }} />
           {/* Keep legacy tabs as a separate screen if desired */}
           <Stack.Screen name="Tabs" options={{ headerShown: false }}>
             {() => (
@@ -61,6 +67,7 @@ function InnerApp() {
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
+      </CurrencyProvider>
       </CategoryProvider>
     </BudgetProvider>
     </LoanProvider>

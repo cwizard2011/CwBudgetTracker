@@ -82,10 +82,12 @@ const darkGrayPalette = {
   progressBackground: '#3A3A3A',
 };
 
-export const Colors: any = { ...lightPalette };
+export type ColorPalette = typeof lightPalette;
+
+export const Colors: ColorPalette = { ...lightPalette };
 
 export function applyTheme(mode: boolean | 'darkDim' | 'darkGray') {
-  let src: any;
+  let src: ColorPalette;
   if (mode === true) src = darkPalette;
   else if (mode === 'darkDim') src = darkDimPalette;
   else if (mode === 'darkGray') src = darkGrayPalette;

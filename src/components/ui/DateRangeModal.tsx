@@ -39,10 +39,10 @@ export const DateRangeModal: React.FC<DateRangeModalProps> = ({ visible, startIS
         </View>
       </View>
       {showStart && (
-        <DateTimePicker value={localStart ? new Date(localStart) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowStart(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setLocalStart(`${y}-${m}-${dd}`);} }} />
+        <DateTimePicker value={localStart ? new Date(localStart) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowStart(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setLocalStart(`${y}-${m}-${dd}`);} }} {...{} as any} />
       )}
       {showEnd && (
-        <DateTimePicker value={localEnd ? new Date(localEnd) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowEnd(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setLocalEnd(`${y}-${m}-${dd}`);} }} />
+        <DateTimePicker value={localEnd ? new Date(localEnd) : new Date()} mode="date" display={Platform.OS==='ios'?'spinner':'calendar'} locale={locale} onChange={(e, d) => { setShowEnd(false); if (d) { const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); setLocalEnd(`${y}-${m}-${dd}`);} }} {...{} as any} />
       )}
     </PromptModal>
   );

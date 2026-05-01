@@ -8,6 +8,7 @@ import { Input } from '../components/ui/Input';
 import { PromptModal } from '../components/ui/PromptModal';
 import { useBudgets } from '../context/BudgetContext';
 import { useCategories } from '../context/CategoryContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { useSettings } from '../context/SettingsContext';
 import { Colors } from '../theme/colors';
 import { useI18n } from '../utils/i18n';
@@ -51,6 +52,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
   const [recurringStopISO, setRecurringStopISO] = useState<string | undefined>(editing?.recurringStopISO);
   const [showStopPicker, setShowStopPicker] = useState(false);
   const { locale } = useSettings();
+  const { displayCurrency } = useCurrency();
 
   const [scopeModalVisible, setScopeModalVisible] = useState(false);
   const [pendingUpdates, setPendingUpdates] = useState<any | null>(null);
@@ -283,6 +285,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
                 setPeriod(`${y}-${m}`);
               }
             }}
+            {...{} as any}
           />
         )}
       </View>
@@ -307,7 +310,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
                   placeholderTextColor={Colors.mutedText}
                 />
                 <TextInput
-                  placeholder={t('budget.itemAmount')}
+                  placeholder={`${t('budget.itemAmount')} (${displayCurrency})`}
                   value={field.amount}
                   onChangeText={(value) => {
                     if (/^\d*\.?\d*$/.test(value)) {
@@ -331,7 +334,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
           </View>
         )}
         <View style={{ marginTop: 12 }}>
-          <Text style={stylesDyn.label}>{t('budget.amountTotal')}</Text>
+          <Text style={stylesDyn.label}>{t('budget.amountTotal')} ({displayCurrency})</Text>
           <Input
             placeholder={t('budget.amount')}
             value={amount}
@@ -374,6 +377,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
                   setRecurringStopISO(`${y}-${m}-${d}`);
                 }
               }}
+              {...{} as any}
             />
           )}
         </View>

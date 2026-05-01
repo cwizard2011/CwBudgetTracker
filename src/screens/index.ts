@@ -2,6 +2,7 @@ export { BudgetHistoryScreen } from './Budget/BudgetHistoryScreen';
 export { BudgetScreen } from './Budget/BudgetScreen';
 export { BudgetDetailsScreen } from './BudgetDetailsScreen';
 export { CategoryPickerScreen } from './CategoryPickerScreen';
+export { CurrencyConverterScreen } from './CurrencyConverterScreen';
 export { HomeScreen } from './HomeScreen';
 export { LoanHistoryScreen } from './loans/LoanHistoryScreen';
 export { LoanInvoiceScreen } from './loans/LoanInvoiceScreen';

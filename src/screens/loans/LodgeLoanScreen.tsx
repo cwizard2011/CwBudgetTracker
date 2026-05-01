@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { IconButton } from '../../components/ui/IconButton';
 import { Input } from '../../components/ui/Input';
 import { PromptModal } from '../../components/ui/PromptModal';
+import { useCurrency } from '../../context/CurrencyContext';
 import { useLoans } from '../../context/LoanContext';
 import { useSettings } from '../../context/SettingsContext';
 import { Colors } from '../../theme/colors';
@@ -27,6 +28,7 @@ export function LodgeLoanScreen({ navigation, route }: any) {
   const editingLoan = route?.params?.loan as (undefined | { id: string; counterpartName: string; type: 'owedByMe'|'owedToMe'; principal: number; loanDate: number });
   const t = useI18n();
   const { locale } = useSettings();
+  const { displayCurrency } = useCurrency();
   const [type, setType] = useState<'owedByMe' | 'owedToMe'>(editingLoan?.type || 'owedByMe');
   const [name, setName] = useState(editingLoan?.counterpartName || '');
   const [selectedCpId, setSelectedCpId] = useState<string | undefined>();
@@ -179,7 +181,7 @@ export function LodgeLoanScreen({ navigation, route }: any) {
       </View>
 
       <View style={{ marginBottom: 12 }}>
-        <Text style={styles.label}>{t('loans.principal')}</Text>
+        <Text style={styles.label}>{t('loans.principal')} ({displayCurrency})</Text>
         <Input placeholder={t('loans.amount')} value={principal} onChangeText={setPrincipal} keyboardType="numeric" />
       </View>
 
@@ -193,10 +195,11 @@ export function LodgeLoanScreen({ navigation, route }: any) {
             value={dateObj}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
-            themeVariant={isDarkBg ? ('dark' as any) : ('light' as any)}
+            themeVariant={isDarkBg ? 'dark' : 'light'}
             locale={locale}
             {...(Platform.OS === 'ios' ? { textColor: Colors.text as any } : {})}
             maximumDate={new Date()}
+            {...{} as any}
             onChange={(event: any, selected?: Date) => {
               if (Platform.OS !== 'ios') setShowDatePicker(false);
               if (selected) {

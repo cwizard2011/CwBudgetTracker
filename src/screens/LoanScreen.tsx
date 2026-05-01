@@ -6,6 +6,7 @@ import { IconButton } from '../components/ui/IconButton';
 import { Input } from '../components/ui/Input';
 import { ProgressBar } from '../components/ui/ProgressBar';
 import { PromptModal } from '../components/ui/PromptModal';
+import { useCurrencyToggle } from '../context/CurrencyContext';
 import { useLoans } from '../context/LoanContext';
 import { useSettings } from '../context/SettingsContext';
 import { Colors } from '../theme/colors';
@@ -28,6 +29,7 @@ const parseLocalISODateToEpoch = (iso: string) => {
 export function LoanScreen({ navigation }: any) {
   const { loans, recordPayment, deleteLoan, counterparties } = useLoans();
   const { locale, currency } = useSettings();
+  const { displayCurrency, convert, hasRates, toggle: toggleCurrency, primaryCurrency, secondaryCurrency, isOnPrimary } = useCurrencyToggle();
   const t = useI18n();
 
   // Inline quick-add removed in favor of Lodge Loan screen
@@ -83,7 +85,7 @@ export function LoanScreen({ navigation }: any) {
 
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }] }>
-      <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }]}>
+      <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <IconButton family="MaterialIcons" name="filter-list" onPress={() => setFilterModalVisible(true)} style={styles.icon} backgroundColor={Colors.surface} color={Colors.primaryDark} />
           <IconButton family="MaterialIcons" name="sort" onPress={() => setSortModalVisible(true)} style={styles.icon} backgroundColor={Colors.surface} color={Colors.secondaryDark} />
@@ -95,6 +97,20 @@ export function LoanScreen({ navigation }: any) {
           )}
           <Button title={t('loans.lodgeLoan')} onPress={openLodgeLoan} variant="primary" />
         </View>
+      </View>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+        <TouchableOpacity
+          onPress={toggleCurrency}
+          style={[styles.currencyToggle, { backgroundColor: Colors.surface, borderColor: Colors.border }]}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.currencyToggleOption, isOnPrimary && styles.currencyToggleActive, { color: isOnPrimary ? Colors.onPrimary : Colors.text, backgroundColor: isOnPrimary ? Colors.primary : 'transparent' }]}>{primaryCurrency}</Text>
+          <Text style={[styles.currencyToggleOption, !isOnPrimary && styles.currencyToggleActive, { color: !isOnPrimary ? Colors.onPrimary : Colors.text, backgroundColor: !isOnPrimary ? Colors.primary : 'transparent' }]}>{secondaryCurrency}</Text>
+        </TouchableOpacity>
+        {!isOnPrimary && !hasRates && (
+          <Text style={{ color: Colors.warning, marginLeft: 8, fontSize: 12 }}>{t('currency.noRatesShort')}</Text>
+        )}
       </View>
 
       {useMemo(() => {
@@ -120,14 +136,14 @@ export function LoanScreen({ navigation }: any) {
         return (
           <>
             <View style={[styles.summaryCard, { backgroundColor: isDarkBg ? Colors.surface : Colors.white }]}>
-              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.owedToMe')}</Text><Text style={styles.summaryValue}>{formatCurrency(owedToMeOutstanding, locale, currency)}</Text></View>
-              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.iOwe')}</Text><Text style={styles.summaryValue}>{formatCurrency(iOweOutstanding, locale, currency)}</Text></View>
-              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.repaid')}</Text><Text style={styles.summaryValue}>{formatCurrency(repaidByMe, locale, currency)}</Text></View>
-              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.recovered')}</Text><Text style={styles.summaryValue}>{formatCurrency(recoveredFromBorrowers, locale, currency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.owedToMe')}</Text><Text style={styles.summaryValue}>{formatCurrency(convert(owedToMeOutstanding), locale, displayCurrency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.iOwe')}</Text><Text style={styles.summaryValue}>{formatCurrency(convert(iOweOutstanding), locale, displayCurrency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.repaid')}</Text><Text style={styles.summaryValue}>{formatCurrency(convert(repaidByMe), locale, displayCurrency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.recovered')}</Text><Text style={styles.summaryValue}>{formatCurrency(convert(recoveredFromBorrowers), locale, displayCurrency)}</Text></View>
               <View style={[styles.summaryRow, { marginTop: 6, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border, paddingTop: 6 }]}>
-                <Text style={[{ color: summaryLabelColor }, { fontWeight: '700' }]}>{t('loans.totalPrincipal')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(totals.principal, locale, currency)}</Text>
+                <Text style={[{ color: summaryLabelColor }, { fontWeight: '700' }]}>{t('loans.totalPrincipal')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(convert(totals.principal), locale, displayCurrency)}</Text>
               </View>
-              <View style={styles.summaryRow}><Text style={[{ color: summaryLabelColor }, { fontWeight: '700' }]}>{t('loans.totalBalance')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(totals.balance, locale, currency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={[{ color: summaryLabelColor }, { fontWeight: '700' }]}>{t('loans.totalBalance')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(convert(totals.balance), locale, displayCurrency)}</Text></View>
             </View>
             <SectionList
               sections={sections}
@@ -150,7 +166,7 @@ export function LoanScreen({ navigation }: any) {
                       </View>
                     </View>
                     <Text style={{ color: Colors.mutedText, marginBottom: 6 }}>
-                      {t('loans.balance')}: {formatCurrency(item.balance || 0, locale, currency)} / {t('loans.principal')}: {formatCurrency(item.principal || 0, locale, currency)}
+                      {t('loans.balance')}: {formatCurrency(convert(item.balance || 0), locale, displayCurrency)} / {t('loans.principal')}: {formatCurrency(convert(item.principal || 0), locale, displayCurrency)}
                     </Text>
                     <ProgressBar
                       progress={item.principal ? (item.principal - item.balance) / item.principal : 0}
@@ -165,7 +181,7 @@ export function LoanScreen({ navigation }: any) {
             />
           </>
         );
-      }, [loans, filterMode, filterName, sortKey, sortDir, groupByType, t])}
+      }, [loans, filterMode, filterName, sortKey, sortDir, groupByType, t, convert, displayCurrency])}
       <PromptModal
         visible={payModalVisible}
         title={t('loans.recordPayment')}
@@ -197,7 +213,6 @@ export function LoanScreen({ navigation }: any) {
             textColor={Colors.text}
             onChange={(event: any, selected?: Date) => {
               if (Platform.OS === 'android') {
-                // On Android, close the picker after selection/dismissal
                 setShowPayDatePicker(false);
               }
               if (selected) {
@@ -207,6 +222,7 @@ export function LoanScreen({ navigation }: any) {
                 setPayDateISO(`${y}-${m}-${d}`);
               }
             }}
+            {...{} as any}
           />
         )}
       </PromptModal>
@@ -316,4 +332,7 @@ const styles = StyleSheet.create({
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 },
   summaryLabel: { color: Colors.mutedText },
   summaryValue: { color: Colors.text },
+  currencyToggle: { flexDirection: 'row', borderWidth: 1, borderRadius: 20, overflow: 'hidden' },
+  currencyToggleOption: { paddingHorizontal: 14, paddingVertical: 5, fontSize: 13, fontWeight: '600' },
+  currencyToggleActive: { borderRadius: 20 },
 });
