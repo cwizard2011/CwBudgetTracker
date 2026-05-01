@@ -41,7 +41,7 @@ export function HomeScreen({ navigation }: any) {
   const bgColor = isDark ? Colors.background : '#F0F2F5';
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor, marginTop: -(insets.top * 2) }]}>
+    <View style={[styles.container, { backgroundColor: bgColor, marginTop: -(insets.top * 1.5) }]}>
       {!isLandscape && <CurrencyCarousel />}
       <ScrollView
         contentContainerStyle={styles.scrollContent}

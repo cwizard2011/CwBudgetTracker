@@ -179,7 +179,7 @@ export function CurrencyCarousel() {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 0,
+    marginBottom: 8,
     marginTop: 0,
     paddingTop: 0,
   },
