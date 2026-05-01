@@ -41,7 +41,7 @@ const darkPalette = {
   text: '#F5F5F5',
   heading: '#FFFFFF',
   mutedText: '#9CA3AF',
-  border: '#374151',
+  border: '#4B5563',
   background: '#121212',
   surface: '#1E1E1E',
   white: '#FFFFFF',
@@ -70,7 +70,7 @@ const darkDimPalette = {
   ...darkPalette,
   background: '#181A1B',
   surface: '#202325',
-  border: '#2A2E31',
+  border: '#444B52',
   progressBackground: '#2A2E31',
 };
 
@@ -78,7 +78,7 @@ const darkGrayPalette = {
   ...darkPalette,
   background: '#1F1F1F',
   surface: '#2A2A2A',
-  border: '#3A3A3A',
+  border: '#505050',
   progressBackground: '#3A3A3A',
 };
 

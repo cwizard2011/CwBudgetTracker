@@ -9,7 +9,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
-import { StatusBar, useColorScheme } from 'react-native';
+import { StatusBar, View, useColorScheme } from 'react-native';
 import { BudgetProvider } from './src/context/BudgetContext';
 import { CategoryProvider } from './src/context/CategoryContext';
 import { CurrencyProvider } from './src/context/CurrencyContext';
@@ -19,7 +19,7 @@ import { BudgetDetailsScreen, BudgetHistoryScreen, BudgetScreen, CategoryPickerS
 import { CurrencyConverterScreen } from './src/screens/CurrencyConverterScreen';
 import { currencyService } from './src/services/CurrencyService';
 import { syncService } from './src/services/SyncService';
-import { applyTheme } from './src/theme/colors';
+import { Colors, applyTheme } from './src/theme/colors';
 import { navigationRef } from './src/utils/navigationRef';
 
 
@@ -44,9 +44,28 @@ function InnerApp() {
       <CategoryProvider>
       <CurrencyProvider>
       <NavigationContainer ref={navigationRef}>
-        <StatusBar barStyle={(resolved === true) ? 'light-content' : 'dark-content'} />
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={HomeScreen} options={{ title: '' }} />
+        <StatusBar barStyle={(resolved === true || resolved === 'darkDim' || resolved === 'darkGray') ? 'light-content' : 'dark-content'} />
+        <Stack.Navigator
+          screenOptions={{
+            headerTintColor: Colors.text,
+            headerTitleStyle: { color: Colors.heading },
+            headerShadowVisible: false,
+            headerBackground: () => (
+              <View style={{
+                flex: 1,
+                backgroundColor: Colors.background,
+                borderBottomWidth: 1,
+                borderBottomColor: Colors.border,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.15,
+                shadowRadius: 3,
+                elevation: 4,
+              }} />
+            ),
+          }}
+        >
+          <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Sections" component={SectionsScreen} options={{ title: 'Sections' }} />
           <Stack.Screen name="BudgetDetails" component={BudgetDetailsScreen} options={{ title: '' }} />
           <Stack.Screen name="CategoryPicker" component={CategoryPickerScreen} options={{ title: 'Category' }} />

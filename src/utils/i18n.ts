@@ -216,6 +216,8 @@ const en: Dictionary = {
   'currency.noRatesAvailable': 'No exchange rate data available. Connect to the internet to fetch rates.',
   'currency.noRatesShort': 'No rates — connect to internet',
   'currency.ratesAsOf': 'Rates as of {date}',
+  'currency.exchangeRates': 'Exchange Rates \u2022 {date}',
+  'currency.loadingRates': 'Loading rates...',
 };
 
 const pt: Dictionary = {
@@ -393,6 +395,8 @@ const pt: Dictionary = {
   'currency.noRatesAvailable': 'Dados de câmbio indisponíveis. Conecte-se à internet para obter as taxas.',
   'currency.noRatesShort': 'Sem taxas — conecte à internet',
   'currency.ratesAsOf': 'Taxas em {date}',
+  'currency.exchangeRates': 'Taxas de Câmbio \u2022 {date}',
+  'currency.loadingRates': 'Carregando taxas...',
 };
 
 const fr: Dictionary = {
@@ -415,6 +419,7 @@ const fr: Dictionary = {
   'home.welcome': 'Bienvenue', 'home.budget': 'Budget', 'home.loans': 'Prêts', 'home.loanHistory': 'Historique des paiements', 'home.budgetHistory': 'Historique du budget', 'home.currencyConverter': 'Convertisseur de devises', 'home.settings': 'Paramètres', 'home.footerDevelopedBy': 'Application développée par', 'home.copyright': 'Droits d\'auteur',
   'settings.secondaryCurrency': 'Devise secondaire', 'settings.secondaryCurrencyHelp': 'Utilisée pour changer rapidement de devise sur les écrans Budget et Prêts.',
   'currency.converterTitle': 'Convertisseur de devises', 'currency.from': 'De', 'currency.to': 'Vers', 'currency.openConverter': 'Ouvrir le convertisseur', 'currency.noRatesAvailable': 'Données de change indisponibles. Connectez-vous à Internet.', 'currency.noRatesShort': 'Pas de taux — connectez-vous', 'currency.ratesAsOf': 'Taux au {date}',
+  'currency.exchangeRates': 'Taux de Change \u2022 {date}', 'currency.loadingRates': 'Chargement des taux...',
 };
 
 const es: Dictionary = {
@@ -429,6 +434,7 @@ const es: Dictionary = {
   'home.welcome': 'Bienvenido', 'home.budget': 'Presupuesto', 'home.loans': 'Préstamos', 'home.loanHistory': 'Historial de pagos', 'home.budgetHistory': 'Historial de presupuesto', 'home.currencyConverter': 'Conversor de divisas', 'home.settings': 'Ajustes', 'home.footerDevelopedBy': 'Aplicación desarrollada por', 'home.copyright': 'Derechos de autor',
   'settings.secondaryCurrency': 'Moneda secundaria', 'settings.secondaryCurrencyHelp': 'Usada para cambio rápido de moneda en las pantallas de Presupuesto y Préstamos.',
   'currency.converterTitle': 'Conversor de divisas', 'currency.from': 'De', 'currency.to': 'A', 'currency.openConverter': 'Abrir conversor', 'currency.noRatesAvailable': 'Datos de cambio no disponibles. Conéctese a Internet.', 'currency.noRatesShort': 'Sin tasas — conéctese', 'currency.ratesAsOf': 'Tasas al {date}',
+  'currency.exchangeRates': 'Tipos de Cambio \u2022 {date}', 'currency.loadingRates': 'Cargando tasas...',
 };
 
 const de: Dictionary = {
@@ -443,6 +449,7 @@ const de: Dictionary = {
   'home.welcome': 'Willkommen', 'home.budget': 'Budget', 'home.loans': 'Darlehen', 'home.loanHistory': 'Zahlungsverlauf', 'home.budgetHistory': 'Budgetverlauf', 'home.currencyConverter': 'Währungsrechner', 'home.settings': 'Einstellungen', 'home.footerDevelopedBy': 'Anwendung entwickelt von', 'home.copyright': 'Urheberrecht',
   'settings.secondaryCurrency': 'Nebenwährung', 'settings.secondaryCurrencyHelp': 'Für schnellen Währungswechsel in Budget- und Darlehensansichten.',
   'currency.converterTitle': 'Währungsrechner', 'currency.from': 'Von', 'currency.to': 'Nach', 'currency.openConverter': 'Währungsrechner öffnen', 'currency.noRatesAvailable': 'Keine Wechselkursdaten. Mit Internet verbinden.', 'currency.noRatesShort': 'Keine Kurse — verbinden', 'currency.ratesAsOf': 'Kurse vom {date}',
+  'currency.exchangeRates': 'Wechselkurse \u2022 {date}', 'currency.loadingRates': 'Kurse werden geladen...',
 };
 
 const dictionaries: Record<string, Dictionary> = { en, pt, fr, es, de };
