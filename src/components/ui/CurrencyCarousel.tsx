@@ -179,8 +179,9 @@ export function CurrencyCarousel() {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 8,
-    marginTop: 8,
+    marginBottom: 0,
+    marginTop: 0,
+    paddingTop: 0,
   },
   headerText: {
     fontSize: 16,

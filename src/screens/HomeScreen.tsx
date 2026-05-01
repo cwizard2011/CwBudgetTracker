@@ -1,5 +1,6 @@
 import { default as React } from 'react';
 import { Platform, ScrollView, StatusBar, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CurrencyCarousel } from '../components/ui/CurrencyCarousel';
 import { NavigationCard } from '../components/ui/NavigationCard';
 import { useSettings } from '../context/SettingsContext';
@@ -12,6 +13,7 @@ const H_PADDING = 12;
 export function HomeScreen({ navigation }: any) {
   const { theme } = useSettings();
   const t = useI18n();
+  const insets = useSafeAreaInsets();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const year = new Date().getFullYear();
   const statusBarH = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 50;
@@ -39,7 +41,7 @@ export function HomeScreen({ navigation }: any) {
   const bgColor = isDark ? Colors.background : '#F0F2F5';
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor, paddingTop: statusBarH }]}>
+    <View style={[styles.container, { backgroundColor: bgColor, marginTop: -(insets.top * 2) }]}>
       {!isLandscape && <CurrencyCarousel />}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -82,7 +84,7 @@ export function HomeScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: H_PADDING },
+  container: { flex: 1, paddingHorizontal: H_PADDING, paddingTop: 8 },
   scrollContent: { flexGrow: 1 },
   grid: { flexGrow: 1 },
   footer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 4 },
