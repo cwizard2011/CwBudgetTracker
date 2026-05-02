@@ -98,5 +98,6 @@ OAuth client IDs (debug vs release) are configured in [src/config/googleDrive.ts
 | [src/context/BudgetContext.tsx](src/context/BudgetContext.tsx) | Most complex context — recurring logic lives here          |
 | [src/theme/colors.ts](src/theme/colors.ts)                     | Mutable theme palette                                      |
 | [RELEASE.md](RELEASE.md)                                       | Step-by-step release build instructions for both platforms |
+| [RELEASE_WORKFLOW.md](RELEASE_WORKFLOW.md)                     | Complete Google Play Store release workflow (versions, notes, bundle) |
 
 
