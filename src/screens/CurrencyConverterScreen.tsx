@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useCurrency } from '../context/CurrencyContext';
 import { useSettings } from '../context/SettingsContext';
@@ -8,37 +8,93 @@ import { useI18n } from '../utils/i18n';
 
 const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'NGN', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'BRL', 'MXN', 'KES', 'ZAR', 'GHS', 'EGP', 'SAR', 'AED', 'SGD', 'HKD'];
 
+type ActiveSide = 'top' | 'bottom';
+
 export function CurrencyConverterScreen() {
   const t = useI18n();
   const { locale, currency: mainCurrency } = useSettings();
-  const { rates, ratesFetchedAt, hasRates, convert } = useCurrency();
+  const { rates, ratesFetchedAt, hasRates } = useCurrency();
 
-  const [fromCurrency, setFromCurrency] = useState(mainCurrency);
-  const [toCurrency, setToCurrency] = useState('USD');
-  const [inputValue, setInputValue] = useState('');
+  const [topCurrency, setTopCurrency] = useState(mainCurrency);
+  const [bottomCurrency, setBottomCurrency] = useState(mainCurrency === 'USD' ? 'EUR' : 'USD');
+  const [topValue, setTopValue] = useState('');
+  const [bottomValue, setBottomValue] = useState('');
+  const [activeSide, setActiveSide] = useState<ActiveSide>('top');
 
-  const convertedAmount = useMemo(() => {
-    const num = parseFloat(inputValue);
-    if (isNaN(num) || !hasRates || !rates) return null;
-    if (fromCurrency === toCurrency) return num;
-    const fromRate = rates[fromCurrency];
-    const toRate = rates[toCurrency];
-    if (!fromRate || !toRate) return null;
-    return (num / fromRate) * toRate;
-  }, [inputValue, fromCurrency, toCurrency, rates, hasRates]);
+  const topInputRef = useRef<TextInput>(null);
+  const bottomInputRef = useRef<TextInput>(null);
+
+  const convertAmount = useCallback((amount: string, from: string, to: string): string => {
+    const num = parseFloat(amount);
+    if (isNaN(num) || !hasRates || !rates) return '';
+    if (from === to) return amount;
+    const fromRate = rates[from];
+    const toRate = rates[to];
+    if (!fromRate || !toRate) return '';
+    const result = (num / fromRate) * toRate;
+    if (result >= 100) return result.toFixed(2);
+    if (result >= 1) return result.toFixed(4);
+    return result.toFixed(6);
+  }, [rates, hasRates]);
+
+  const handleTopChange = useCallback((text: string) => {
+    setTopValue(text);
+    setActiveSide('top');
+    setBottomValue(text ? convertAmount(text, topCurrency, bottomCurrency) : '');
+  }, [topCurrency, bottomCurrency, convertAmount]);
+
+  const handleBottomChange = useCallback((text: string) => {
+    setBottomValue(text);
+    setActiveSide('bottom');
+    setTopValue(text ? convertAmount(text, bottomCurrency, topCurrency) : '');
+  }, [topCurrency, bottomCurrency, convertAmount]);
+
+  const handleTopCurrencyChange = useCallback((c: string) => {
+    setTopCurrency(c);
+    if (activeSide === 'top' && topValue) {
+      setBottomValue(convertAmount(topValue, c, bottomCurrency));
+    } else if (activeSide === 'bottom' && bottomValue) {
+      setTopValue(convertAmount(bottomValue, bottomCurrency, c));
+    }
+  }, [activeSide, topValue, bottomValue, bottomCurrency, convertAmount]);
+
+  const handleBottomCurrencyChange = useCallback((c: string) => {
+    setBottomCurrency(c);
+    if (activeSide === 'top' && topValue) {
+      setBottomValue(convertAmount(topValue, topCurrency, c));
+    } else if (activeSide === 'bottom' && bottomValue) {
+      setTopValue(convertAmount(bottomValue, c, topCurrency));
+    }
+  }, [activeSide, topValue, bottomValue, topCurrency, convertAmount]);
 
   const swap = useCallback(() => {
-    setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
-  }, [fromCurrency, toCurrency]);
+    setTopCurrency(bottomCurrency);
+    setBottomCurrency(topCurrency);
+    setTopValue(bottomValue);
+    setBottomValue(topValue);
+    setActiveSide(prev => prev === 'top' ? 'bottom' : 'top');
+  }, [topCurrency, bottomCurrency, topValue, bottomValue]);
 
   const fetchedAtLabel = useMemo(() => {
     if (!ratesFetchedAt) return null;
     return new Date(ratesFetchedAt).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
   }, [ratesFetchedAt, locale]);
 
+  const rateDisplay = useMemo(() => {
+    if (!hasRates || !rates) return null;
+    const topRate = rates[topCurrency];
+    const bottomRate = rates[bottomCurrency];
+    if (!topRate || !bottomRate) return null;
+    const rate = bottomRate / topRate;
+    const inverseRate = topRate / bottomRate;
+    if (rate < 0.005) {
+      return `1 ${bottomCurrency} = ${formatCurrency(inverseRate, locale, topCurrency)}`;
+    }
+    return `1 ${topCurrency} = ${formatCurrency(rate, locale, bottomCurrency)}`;
+  }, [hasRates, rates, topCurrency, bottomCurrency, locale]);
+
   return (
-    <ScrollView style={[styles.container, { backgroundColor: Colors.background }]} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+    <ScrollView style={[styles.container, { backgroundColor: Colors.background }]} contentContainerStyle={{ padding: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
       <Text style={[styles.heading, { color: Colors.heading }]}>{t('currency.converterTitle')}</Text>
 
       {!hasRates && (
@@ -53,17 +109,21 @@ export function CurrencyConverterScreen() {
         </Text>
       )}
 
-      <View style={[styles.card, { backgroundColor: Colors.surface, borderColor: Colors.border }]}>
-        <Text style={[styles.label, { color: Colors.mutedText }]}>{t('currency.from')}</Text>
+      <View style={[
+        styles.card,
+        { backgroundColor: Colors.surface, borderColor: activeSide === 'top' ? Colors.primary : Colors.border },
+      ]}>
         <CurrencySelector
-          selected={fromCurrency}
-          onSelect={setFromCurrency}
-          exclude={toCurrency}
+          selected={topCurrency}
+          onSelect={handleTopCurrencyChange}
+          exclude={bottomCurrency}
         />
         <TextInput
-          style={[styles.amountInput, { color: Colors.text, borderColor: Colors.border }]}
-          value={inputValue}
-          onChangeText={setInputValue}
+          ref={topInputRef}
+          style={[styles.amountInput, { color: Colors.text, borderColor: activeSide === 'top' ? Colors.primary : Colors.border }]}
+          value={topValue}
+          onChangeText={handleTopChange}
+          onFocus={() => setActiveSide('top')}
           keyboardType="numeric"
           placeholder="0.00"
           placeholderTextColor={Colors.mutedText}
@@ -74,40 +134,30 @@ export function CurrencyConverterScreen() {
         <Text style={{ color: Colors.onPrimary, fontSize: 20 }}>⇅</Text>
       </TouchableOpacity>
 
-      <View style={[styles.card, { backgroundColor: Colors.surface, borderColor: Colors.border }]}>
-        <Text style={[styles.label, { color: Colors.mutedText }]}>{t('currency.to')}</Text>
+      <View style={[
+        styles.card,
+        { backgroundColor: Colors.surface, borderColor: activeSide === 'bottom' ? Colors.primary : Colors.border },
+      ]}>
         <CurrencySelector
-          selected={toCurrency}
-          onSelect={setToCurrency}
-          exclude={fromCurrency}
+          selected={bottomCurrency}
+          onSelect={handleBottomCurrencyChange}
+          exclude={topCurrency}
         />
-        <View style={[styles.resultBox, { borderColor: Colors.border }]}>
-          <Text style={[styles.resultText, { color: convertedAmount !== null ? Colors.text : Colors.mutedText }]}>
-            {convertedAmount !== null
-              ? formatCurrency(convertedAmount, locale, toCurrency)
-              : '—'}
-          </Text>
-        </View>
+        <TextInput
+          ref={bottomInputRef}
+          style={[styles.amountInput, { color: Colors.text, borderColor: activeSide === 'bottom' ? Colors.primary : Colors.border }]}
+          value={bottomValue}
+          onChangeText={handleBottomChange}
+          onFocus={() => setActiveSide('bottom')}
+          keyboardType="numeric"
+          placeholder="0.00"
+          placeholderTextColor={Colors.mutedText}
+        />
       </View>
 
-      {hasRates && rates && convertedAmount !== null && (
+      {rateDisplay && (
         <View style={[styles.rateInfo, { backgroundColor: Colors.surface, borderColor: Colors.border }]}>
-          <Text style={{ color: Colors.mutedText, fontSize: 13 }}>
-            {(() => {
-              const fromRate = rates[fromCurrency];
-              const toRate = rates[toCurrency];
-              if (!fromRate || !toRate) return null;
-              const rate = toRate / fromRate;
-              // If rate rounds to zero in the target currency's format, flip to inverse
-              // so we never show "1 NGN = $0.00" — instead show "1 USD = ₦1,600"
-              const inverseRate = fromRate / toRate;
-              const showInverse = rate < 0.005;
-              if (showInverse) {
-                return `1 ${toCurrency} = ${formatCurrency(inverseRate, locale, fromCurrency)}`;
-              }
-              return `1 ${fromCurrency} = ${formatCurrency(rate, locale, toCurrency)}`;
-            })()}
-          </Text>
+          <Text style={{ color: Colors.mutedText, fontSize: 13 }}>{rateDisplay}</Text>
         </View>
       )}
     </ScrollView>
@@ -142,10 +192,7 @@ const styles = StyleSheet.create({
   noRatesBox: { borderWidth: 1, borderRadius: 8, padding: 12, marginBottom: 12 },
   rateDate: { fontSize: 12, marginBottom: 12 },
   card: { borderWidth: 1, borderRadius: 12, padding: 14, marginBottom: 12 },
-  label: { fontSize: 12, fontWeight: '600', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
   amountInput: { borderWidth: 1, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 14, fontSize: 24, fontWeight: '600' },
-  resultBox: { borderWidth: 1, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 14, minHeight: 50, justifyContent: 'center' },
-  resultText: { fontSize: 24, fontWeight: '600' },
   swapButton: { alignSelf: 'center', width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   chip: { borderWidth: 1, borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5, marginRight: 6 },
   rateInfo: { borderWidth: 1, borderRadius: 8, padding: 10, alignItems: 'center' },

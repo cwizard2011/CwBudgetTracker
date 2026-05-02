@@ -48,6 +48,7 @@ There is no Redux or Zustand. Components import context hooks directly.
 [src/services/LocalStorage.ts](src/services/LocalStorage.ts) is the source of truth for all app data. It wraps AsyncStorage and maintains a **pending mutations queue** for operations made while offline.
 
 [src/services/SyncService.ts](src/services/SyncService.ts) watches network connectivity (NetInfo) and:
+
 1. **pushPending()** — flushes queued mutations to Firestore
 2. **pullRemote()** — fetches all remote records
 3. **mergeRecordsById()** — picks winner by `updatedAt` timestamp; never overwrites local data with an empty remote response
@@ -89,10 +90,13 @@ OAuth client IDs (debug vs release) are configured in [src/config/googleDrive.ts
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| [App.tsx](App.tsx) | Root component — wraps contexts, sets up navigation |
-| [src/services/SyncService.ts](src/services/SyncService.ts) | Firestore bidirectional sync |
-| [src/context/BudgetContext.tsx](src/context/BudgetContext.tsx) | Most complex context — recurring logic lives here |
-| [src/theme/colors.ts](src/theme/colors.ts) | Mutable theme palette |
-| [RELEASE.md](RELEASE.md) | Step-by-step release build instructions for both platforms |
+
+| File                                                           | Purpose                                                    |
+| -------------------------------------------------------------- | ---------------------------------------------------------- |
+| [App.tsx](App.tsx)                                             | Root component — wraps contexts, sets up navigation        |
+| [src/services/SyncService.ts](src/services/SyncService.ts)     | Firestore bidirectional sync                               |
+| [src/context/BudgetContext.tsx](src/context/BudgetContext.tsx) | Most complex context — recurring logic lives here          |
+| [src/theme/colors.ts](src/theme/colors.ts)                     | Mutable theme palette                                      |
+| [RELEASE.md](RELEASE.md)                                       | Step-by-step release build instructions for both platforms |
+
+
