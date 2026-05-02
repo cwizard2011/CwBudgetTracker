@@ -29,26 +29,26 @@
 
 <fr-FR>
 ✨ Nouvelles Fonctionnalités:
-• Mise à jour des taux de change en temps réel toutes les 5 minutes lors de l'utilisation de l'application
-• Actualisation automatique des taux lors de l'ouverture de l'application
+• Mise à jour des taux de change toutes les 5 minutes lors de l'utilisation
+• Actualisation automatique lors de l'ouverture de l'application
 
 🐛 Corrections de Bugs:
 • Correction des taux de change obsolètes mis en cache jusqu'à 9h GMT
-• Espacement amélioré de la mise en page HomeScreen
+• Espacement amélioré du HomeScreen
 
-💡 BudgetTracker 2.6.0 garantit que vous voyez toujours les taux de change actuels pour des conversions de devises précises. De plus, une interface d'écran d'accueil plus propre.
+💡 BudgetTracker 2.6.0 garantit que vous voyez toujours les taux de change actuels pour des conversions précises. Une interface d'écran d'accueil plus propre.
 </fr-FR>
 
 <es-ES>
 ✨ Nuevas Funcionalidades:
-• Actualización de tasas de cambio en tiempo real cada 5 minutos mientras la aplicación está activa
-• Actualización automática de tasas al abrir la aplicación
+• Actualización de tasas de cambio en tiempo real cada 5 minutos durante el uso
+• Actualización automática al abrir la aplicación
 
 🐛 Correcciones de Errores:
 • Corregidas tasas de cambio obsoletas que se almacenaban en caché hasta las 9am GMT
-• Espaciado mejorado del diseño de HomeScreen
+• Espaciado mejorado del HomeScreen
 
-💡 BudgetTracker 2.6.0 garantiza que siempre veas tasas de cambio actuales para conversiones de divisas precisas. Además, una interfaz de pantalla de inicio más limpia.
+💡 BudgetTracker 2.6.0 garantiza que siempre veas tasas actuales para conversiones precisas. Una interfaz de pantalla de inicio más limpia.
 </es-ES>
 
 <de-DE>
