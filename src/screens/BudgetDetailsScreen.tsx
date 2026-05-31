@@ -77,8 +77,8 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
     }));
     setSaveAndExit(true);
     if (isEditing) {
-      const updates = { title, amountPlanned: parseFloat(amount), period, category, categoryIcon, recurring, anchorDateISO: anchor, dateISO, notes, recurringStopISO: resolvedStop, items: itemsToSave };
-      if (editing.recurring !== 'none' && recurring !== 'none') { // Show prompt only if already a recurrent budget
+      const updates = { title, amountPlanned: parseFloat(amount), period, category, categoryIcon, recurring, anchorDateISO: anchor, dateISO, notes, recurringStopISO: resolvedStop, items: itemsToSave, currency: displayCurrency };
+      if (editing.recurring !== 'none' && recurring !== 'none') {
         setPendingUpdates(updates);
         setScopeModalVisible(true);
       } else {
@@ -89,7 +89,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
       if (chosenCategory === 'General' && !categories.includes('General')) {
         await addCategory('General');
       }
-      await addBudget({ title, amountPlanned: parseFloat(amount), period, category: chosenCategory, categoryIcon, recurring, anchorDateISO: anchor, dateISO, notes, recurringStopISO: resolvedStop, items: itemsToSave });
+      await addBudget({ title, amountPlanned: parseFloat(amount), period, category: chosenCategory, categoryIcon, recurring, anchorDateISO: anchor, dateISO, notes, recurringStopISO: resolvedStop, items: itemsToSave, currency: displayCurrency });
       navigation.goBack();
     }
   };
@@ -142,8 +142,8 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
     const chosenCategory = (category && category.trim()) ? category : 'General';
     const itemsToSave = itemFields.map(field => ({ name: field.name, amount: parseFloat(field.amount) }));
     if (isEditing) {
-      const updates = { title, amountPlanned: parseFloat(amount), period, category, categoryIcon, recurring, anchorDateISO: anchor, dateISO, notes, recurringStopISO: resolvedStop, items: itemsToSave };
-      if (editing.recurring !== 'none' && recurring !== 'none') { // Show prompt only if already a recurrent budget
+      const updates = { title, amountPlanned: parseFloat(amount), period, category, categoryIcon, recurring, anchorDateISO: anchor, dateISO, notes, recurringStopISO: resolvedStop, items: itemsToSave, currency: displayCurrency };
+      if (editing.recurring !== 'none' && recurring !== 'none') {
         setPendingUpdates(updates);
         setScopeModalVisible(true);
       } else {
@@ -154,7 +154,7 @@ export function BudgetDetailsScreen({ navigation, route }: any) {
       if (chosenCategory === 'General' && !categories.includes('General')) {
         await addCategory('General');
       }
-      await addBudget({ title, amountPlanned: parseFloat(amount), period, category: chosenCategory, categoryIcon, recurring, anchorDateISO: anchor, dateISO, notes, recurringStopISO: resolvedStop, items: itemsToSave });
+      await addBudget({ title, amountPlanned: parseFloat(amount), period, category: chosenCategory, categoryIcon, recurring, anchorDateISO: anchor, dateISO, notes, recurringStopISO: resolvedStop, items: itemsToSave, currency: displayCurrency });
       resetForm();
     }
   };

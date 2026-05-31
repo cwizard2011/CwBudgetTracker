@@ -12,7 +12,7 @@ interface LoanContextValue {
     type: Loan['type'],
     principal: number,
     loanDate: number,
-    options?: { saveCounterparty?: boolean; notes?: string }
+    options?: { saveCounterparty?: boolean; notes?: string; currency?: string }
   ) => Promise<void>;
   addCounterparty: (name: string) => Promise<string>;
   recordPayment: (loanId: string, amount: number, notes?: string, dateOverrideMs?: number) => Promise<void>;
@@ -84,7 +84,6 @@ export const LoanProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await persistAndQueueLoans(next);
       await LocalStorage.enqueueMutation({ collection: 'loans', type: 'update', payload: updated });
     } else {
-      // Create new record
       const newLoan: Loan = {
         id: uuid.v4().toString(),
         counterpartName: name,
@@ -96,6 +95,7 @@ export const LoanProvider: React.FC<{ children: React.ReactNode }> = ({ children
         issuances: [{ id: uuid.v4().toString(), amount: principal, date: loanDate, notes: options?.notes }],
         loanDate,
         notes: options?.notes,
+        currency: options?.currency,
         createdAt: now,
         updatedAt: now,
       };

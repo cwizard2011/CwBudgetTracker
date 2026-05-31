@@ -136,7 +136,7 @@ export function LodgeLoanScreen({ navigation, route }: any) {
     }
     const finalName = typedName;
     const finalNotes = notes && notes.trim() ? notes : defaultNote(finalName, type, parseFloat(principal), dateISO);
-    await addLoan({ id: selectedCpId, name: finalName }, type, parseFloat(principal), loanDate, { saveCounterparty, notes: finalNotes });
+    await addLoan({ id: selectedCpId, name: finalName }, type, parseFloat(principal), loanDate, { saveCounterparty, notes: finalNotes, currency: displayCurrency });
     navigation.goBack();
   };
 
@@ -232,13 +232,12 @@ export function LodgeLoanScreen({ navigation, route }: any) {
         const loanDate = parseLocalISODateToEpoch(dateISO);
         const amount = parseFloat(principal);
         if (selectedMatch !== 'new') {
-          // Merge into existing by name
           const mergeNotes = notes && notes.trim() ? notes : defaultNote(selectedMatch, type, amount, dateISO);
-          await addLoan({ name: selectedMatch }, type, amount, loanDate, { saveCounterparty: false, notes: mergeNotes });
+          await addLoan({ name: selectedMatch }, type, amount, loanDate, { saveCounterparty: false, notes: mergeNotes, currency: displayCurrency });
         } else {
           const typedName = name || '';
           const newNotes = notes && notes.trim() ? notes : defaultNote(typedName, type, amount, dateISO);
-          await addLoan({ name: typedName }, type, amount, loanDate, { saveCounterparty: true, notes: newNotes });
+          await addLoan({ name: typedName }, type, amount, loanDate, { saveCounterparty: true, notes: newNotes, currency: displayCurrency });
         }
         setConfirmVisible(false);
         navigation.goBack();

@@ -49,11 +49,11 @@ export function LoanInvoiceScreen({ navigation, route }: any) {
         </View>
         <View style={styles.rowBetween}>
           <Text style={styles.label}>{t('invoice.principal')}</Text>
-          <Text style={styles.value}>{formatCurrency(loan.principal || 0, locale, currency)}</Text>
+          <Text style={styles.value}>{formatCurrency(loan.principal || 0, locale, loan.currency || currency)}</Text>
         </View>
         <View style={styles.rowBetween}>
           <Text style={styles.label}>{t('invoice.balance')}</Text>
-          <Text style={styles.value}>{formatCurrency(loan.balance || 0, locale, currency)}</Text>
+          <Text style={styles.value}>{formatCurrency(loan.balance || 0, locale, loan.currency || currency)}</Text>
         </View>
         <View style={styles.rowBetween}>
           <Text style={styles.label}>{t('invoice.date')}</Text>
@@ -79,7 +79,7 @@ export function LoanInvoiceScreen({ navigation, route }: any) {
             <View key={r.id} style={styles.rowBetween}>
               <Text style={styles.label}>{new Date(r.date).toLocaleDateString(locale)}</Text>
               <Text style={styles.label}>{r.type}</Text>
-              <Text style={styles.value}>{formatCurrency(r.amount || 0, locale, currency)}</Text>
+              <Text style={styles.value}>{formatCurrency(r.amount || 0, locale, loan.currency || currency)}</Text>
             </View>
           ));
         })()}
@@ -87,7 +87,7 @@ export function LoanInvoiceScreen({ navigation, route }: any) {
 
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 16 }}>
         <Button title={t('common.close')} onPress={() => navigation.goBack()} variant="neutral" style={{ marginRight: 8 }} />
-        <Button title={t('invoice.print')} onPress={() => invoiceService.printAndUploadLoanInvoice(loan, locale, currency)} variant="primary" />
+        <Button title={t('invoice.print')} onPress={() => invoiceService.printAndUploadLoanInvoice(loan, locale, loan.currency || currency)} variant="primary" />
       </View>
     </ScrollView>
   );

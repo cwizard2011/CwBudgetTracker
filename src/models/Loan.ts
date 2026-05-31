@@ -25,6 +25,8 @@ export interface Loan {
   issuances?: Issuance[];
   loanDate: number; // epoch millis (user-chosen)
   notes?: string;
+  /** ISO 4217 currency code the amounts were entered in (e.g. 'USD', 'NGN'). Defaults to the user's primary currency for legacy records. */
+  currency?: string;
   createdAt: number;
   updatedAt: number;
 }

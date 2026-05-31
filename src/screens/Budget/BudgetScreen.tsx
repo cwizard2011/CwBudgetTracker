@@ -147,10 +147,10 @@ export function BudgetScreen() {
   }, [filtered, groupBy, sortKey, sortDir, collapsed]);
 
   const monthTotals = useMemo(() => {
-    const planned = filtered.reduce((s, b) => s + (b.amountPlanned || 0), 0);
-    const spent = filtered.reduce((s, b) => s + (b.amountSpent || 0), 0);
+    const planned = filtered.reduce((s, b) => s + convert(b.amountPlanned || 0, b.currency), 0);
+    const spent = filtered.reduce((s, b) => s + convert(b.amountSpent || 0, b.currency), 0);
     return { planned, spent };
-  }, [filtered]);
+  }, [filtered, convert]);
 
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
@@ -185,26 +185,26 @@ export function BudgetScreen() {
         <Text style={{ fontWeight: '700', color: Colors.text }}>{t('budget.summaries')}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
           <Text style={{ color: Colors.text }}>{t('budget.plannedTotal')}</Text>
-          <Text style={{ color: Colors.text }}>{formatCurrency(convert(monthTotals.planned), locale, displayCurrency)}</Text>
+          <Text style={{ color: Colors.text }}>{formatCurrency(monthTotals.planned, locale, displayCurrency)}</Text>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
           <Text style={{ color: Colors.text }}>{t('budget.spentTotal')}</Text>
-          <Text style={{ color: Colors.text }}>{formatCurrency(convert(monthTotals.spent), locale, displayCurrency)}</Text>
+          <Text style={{ color: Colors.text }}>{formatCurrency(monthTotals.spent, locale, displayCurrency)}</Text>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
           <Text style={{ color: Colors.text }}>{t('budget.remainingTotal')}</Text>
-          <Text style={{ color: Colors.text }}>{formatCurrency(convert(monthTotals.planned - monthTotals.spent), locale, displayCurrency)}</Text>
+          <Text style={{ color: Colors.text }}>{formatCurrency(monthTotals.planned - monthTotals.spent, locale, displayCurrency)}</Text>
         </View>
         {(() => {
           const totalExcess = filtered.reduce((sum, b) => {
-            const over = (b.amountSpent || 0) - (b.amountPlanned || 0);
+            const over = convert(b.amountSpent || 0, b.currency) - convert(b.amountPlanned || 0, b.currency);
             return sum + (over > 0 ? over : 0);
           }, 0);
           return (
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
               <Text style={{ color: Colors.text, fontWeight: '700' }}>{t('budget.excess')}</Text>
               <Text style={{ color: totalExcess > 0 ? Colors.error : Colors.mutedText, fontWeight: '700' }}>
-                {formatCurrency(convert(totalExcess), locale, displayCurrency)}
+                {formatCurrency(totalExcess, locale, displayCurrency)}
               </Text>
             </View>
           );
@@ -243,7 +243,7 @@ export function BudgetScreen() {
                   )}
                 </View>
               </View>
-              <Text style={{ marginBottom: 6, color: Colors.text }}>{formatCurrency(convert(item.amountSpent || 0), locale, displayCurrency)} / {formatCurrency(convert(item.amountPlanned || 0), locale, displayCurrency)}</Text>
+              <Text style={{ marginBottom: 6, color: Colors.text }}>{formatCurrency(convert(item.amountSpent || 0, item.currency), locale, displayCurrency)} / {formatCurrency(convert(item.amountPlanned || 0, item.currency), locale, displayCurrency)}</Text>
               <ProgressBar progress={item.amountPlanned ? item.amountSpent / item.amountPlanned : 0} fillColor={Colors.success} />
               {expandedBudgetId === item.id && item.items && (
                 <View>
@@ -255,7 +255,7 @@ export function BudgetScreen() {
                         theme={theme} // Pass the current theme here
                       />
                       <Text style={{ flex: 1, marginLeft: 8, color: Colors.text, textDecorationLine: subItem.isCompleted ? 'line-through' : 'none' }} numberOfLines={1} ellipsizeMode="tail">{subItem.name}</Text>
-                      <Text style={{ marginLeft: 8, color: Colors.text, textDecorationLine: subItem.isCompleted ? 'line-through' : 'none' }}>{formatCurrency(convert(subItem.amount), locale, displayCurrency)}</Text>
+                      <Text style={{ marginLeft: 8, color: Colors.text, textDecorationLine: subItem.isCompleted ? 'line-through' : 'none' }}>{formatCurrency(convert(subItem.amount, item.currency), locale, displayCurrency)}</Text>
                     </View>
                   ))}
                 </View>

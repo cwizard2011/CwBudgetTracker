@@ -122,11 +122,11 @@ export function LoanScreen({ navigation }: any) {
           const cmp = sortKey === 'date' ? (a.loanDate - b.loanDate) : ((a.principal || 0) - (b.principal || 0));
           return sortDir === 'asc' ? cmp : -cmp;
         });
-        const totals = list.reduce((acc, l) => { acc.principal += (l.principal || 0); acc.balance += (l.balance || 0); return acc; }, { principal: 0, balance: 0 });
-        const owedToMeOutstanding = list.filter(l => l.type === 'owedToMe').reduce((s, l) => s + (l.balance || 0), 0);
-        const iOweOutstanding = list.filter(l => l.type === 'owedByMe').reduce((s, l) => s + (l.balance || 0), 0);
-        const repaidByMe = list.filter(l => l.type === 'owedByMe').reduce((s, l) => s + (l.payments || []).reduce((p, x) => p + (x.amount || 0), 0), 0);
-        const recoveredFromBorrowers = list.filter(l => l.type === 'owedToMe').reduce((s, l) => s + (l.payments || []).reduce((p, x) => p + (x.amount || 0), 0), 0);
+        const totals = list.reduce((acc, l) => { acc.principal += convert(l.principal || 0, l.currency); acc.balance += convert(l.balance || 0, l.currency); return acc; }, { principal: 0, balance: 0 });
+        const owedToMeOutstanding = list.filter(l => l.type === 'owedToMe').reduce((s, l) => s + convert(l.balance || 0, l.currency), 0);
+        const iOweOutstanding = list.filter(l => l.type === 'owedByMe').reduce((s, l) => s + convert(l.balance || 0, l.currency), 0);
+        const repaidByMe = list.filter(l => l.type === 'owedByMe').reduce((s, l) => s + (l.payments || []).reduce((p, x) => p + convert(x.amount || 0, l.currency), 0), 0);
+        const recoveredFromBorrowers = list.filter(l => l.type === 'owedToMe').reduce((s, l) => s + (l.payments || []).reduce((p, x) => p + convert(x.amount || 0, l.currency), 0), 0);
         const sections = groupByType
           ? [
               { title: t('loans.iOwe'), data: list.filter(l => l.type === 'owedByMe') },
@@ -136,14 +136,14 @@ export function LoanScreen({ navigation }: any) {
         return (
           <>
             <View style={[styles.summaryCard, { backgroundColor: isDarkBg ? Colors.surface : Colors.white }]}>
-              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.owedToMe')}</Text><Text style={styles.summaryValue}>{formatCurrency(convert(owedToMeOutstanding), locale, displayCurrency)}</Text></View>
-              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.iOwe')}</Text><Text style={styles.summaryValue}>{formatCurrency(convert(iOweOutstanding), locale, displayCurrency)}</Text></View>
-              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.repaid')}</Text><Text style={styles.summaryValue}>{formatCurrency(convert(repaidByMe), locale, displayCurrency)}</Text></View>
-              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.recovered')}</Text><Text style={styles.summaryValue}>{formatCurrency(convert(recoveredFromBorrowers), locale, displayCurrency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.owedToMe')}</Text><Text style={styles.summaryValue}>{formatCurrency(owedToMeOutstanding, locale, displayCurrency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.iOwe')}</Text><Text style={styles.summaryValue}>{formatCurrency(iOweOutstanding, locale, displayCurrency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.repaid')}</Text><Text style={styles.summaryValue}>{formatCurrency(repaidByMe, locale, displayCurrency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={{ color: summaryLabelColor }}>{t('loans.recovered')}</Text><Text style={styles.summaryValue}>{formatCurrency(recoveredFromBorrowers, locale, displayCurrency)}</Text></View>
               <View style={[styles.summaryRow, { marginTop: 6, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border, paddingTop: 6 }]}>
-                <Text style={[{ color: summaryLabelColor }, { fontWeight: '700' }]}>{t('loans.totalPrincipal')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(convert(totals.principal), locale, displayCurrency)}</Text>
+                <Text style={[{ color: summaryLabelColor }, { fontWeight: '700' }]}>{t('loans.totalPrincipal')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(totals.principal, locale, displayCurrency)}</Text>
               </View>
-              <View style={styles.summaryRow}><Text style={[{ color: summaryLabelColor }, { fontWeight: '700' }]}>{t('loans.totalBalance')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(convert(totals.balance), locale, displayCurrency)}</Text></View>
+              <View style={styles.summaryRow}><Text style={[{ color: summaryLabelColor }, { fontWeight: '700' }]}>{t('loans.totalBalance')}</Text><Text style={[styles.summaryValue, { fontWeight: '700' }]}>{formatCurrency(totals.balance, locale, displayCurrency)}</Text></View>
             </View>
             <SectionList
               sections={sections}
@@ -166,7 +166,7 @@ export function LoanScreen({ navigation }: any) {
                       </View>
                     </View>
                     <Text style={{ color: Colors.mutedText, marginBottom: 6 }}>
-                      {t('loans.balance')}: {formatCurrency(convert(item.balance || 0), locale, displayCurrency)} / {t('loans.principal')}: {formatCurrency(convert(item.principal || 0), locale, displayCurrency)}
+                      {t('loans.balance')}: {formatCurrency(convert(item.balance || 0, item.currency), locale, displayCurrency)} / {t('loans.principal')}: {formatCurrency(convert(item.principal || 0, item.currency), locale, displayCurrency)}
                     </Text>
                     <ProgressBar
                       progress={item.principal ? (item.principal - item.balance) / item.principal : 0}
