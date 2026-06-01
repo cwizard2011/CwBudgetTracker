@@ -25,6 +25,7 @@ export function SettingsScreen() {
   const [busy, setBusy] = useState<'backup' | 'pick' | 'restore' | 'gdBackup' | 'gdRestore' | null>(null);
   const [confirmRestoreVisible, setConfirmRestoreVisible] = useState(false);
   const [confirmDriveRestoreVisible, setConfirmDriveRestoreVisible] = useState(false);
+  const [driveSuccessModal, setDriveSuccessModal] = useState<'backup' | 'restore' | null>(null);
   const [selectedRestorePath, setSelectedRestorePath] = useState<string>('');
 
   const handleCreateBackup = async () => {
@@ -82,7 +83,7 @@ export function SettingsScreen() {
     setBusy('gdBackup');
     try {
       await googleDriveBackupService.uploadBackup();
-      setStatus(t('settings.googleDrive.backupSuccess'));
+      setDriveSuccessModal('backup');
     } catch (error: any) {
       const code = error?.code as string | undefined;
       const msg = error?.message as string | undefined;
@@ -127,7 +128,7 @@ export function SettingsScreen() {
     setBusy('gdRestore');
     try {
       await googleDriveBackupService.restoreBackup();
-      setStatus(t('settings.googleDrive.restoreSuccess'));
+      setDriveSuccessModal('restore');
     } catch (error: any) {
       const code = error?.code as string | undefined;
       const msg = error?.message as string | undefined;
@@ -316,6 +317,20 @@ export function SettingsScreen() {
         cancelText={t('common.cancel')}
       >
         <Text style={{ color: Colors.text }}>{t('settings.googleDrive.restoreWarning')}</Text>
+      </PromptModal>
+
+      <PromptModal
+        visible={driveSuccessModal !== null}
+        title={t('common.success')}
+        onCancel={() => setDriveSuccessModal(null)}
+        showConfirm={false}
+        cancelText={t('common.close')}
+        cancelVariant="success"
+      >
+        <Text style={{ color: Colors.text }}>
+          {driveSuccessModal === 'backup' && t('settings.googleDrive.backupSuccess')}
+          {driveSuccessModal === 'restore' && t('settings.googleDrive.restoreSuccess')}
+        </Text>
       </PromptModal>
     </ScrollView>
   );
