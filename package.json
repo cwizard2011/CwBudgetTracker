@@ -1,6 +1,6 @@
 {
   "name": "CwBudgetTracker",
-  "version": "2.6.3",
+  "version": "2.6.4",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -74,5 +74,9 @@
   "engines": {
     "node": ">=18"
   },
-  "overrides": {}
+  "overrides": {
+    "react-native-print": {
+      "react-native-windows": "0.80.6"
+    }
+  }
 }
