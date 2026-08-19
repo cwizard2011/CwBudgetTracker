@@ -5,4 +5,6 @@ export const STORAGE_KEYS = {
   PENDING_MUTATIONS: 'pending_mutations',
   SETTINGS: 'settings',
   EXCHANGE_RATES: 'exchange_rates_cache',
+  BILL_READINGS: 'bill_readings',
+  BILL_RATES: 'bill_rates',
 } as const;

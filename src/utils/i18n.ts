@@ -198,8 +198,11 @@ const en: Dictionary = {
   'period.annual': 'Annual',
 
   'home.welcome': 'Welcome',
+  'home.overview': 'Overview',
+  'home.quickAccess': 'Quick access',
   'home.budget': 'Budget',
   'home.loans': 'Loans',
+  'home.bills': 'Bills',
   'home.loanHistory': 'Loan payment history',
   'home.budgetHistory': 'Budget history',
   'home.currencyConverter': 'Currency Converter',
@@ -378,8 +381,11 @@ const pt: Dictionary = {
   'period.annual': 'Anual',
 
   'home.welcome': 'Bem-vindo',
+  'home.overview': 'Visão geral',
+  'home.quickAccess': 'Acesso rápido',
   'home.budget': 'Orçamento',
   'home.loans': 'Empréstimos',
+  'home.bills': 'Contas',
   'home.loanHistory': 'Histórico de pagamentos',
   'home.budgetHistory': 'Histórico de orçamento',
   'home.currencyConverter': 'Conversor de Moedas',
@@ -402,6 +408,8 @@ const pt: Dictionary = {
 };
 
 const fr: Dictionary = {
+  'home.overview': 'Vue d\'ensemble',
+  'home.quickAccess': 'Accès rapide',
   'settings.title': 'Paramètres',
   'settings.appearance': 'Apparence',
   'settings.language': 'Langue',
@@ -425,6 +433,8 @@ const fr: Dictionary = {
 };
 
 const es: Dictionary = {
+  'home.overview': 'Resumen',
+  'home.quickAccess': 'Acceso rápido',
   'settings.title': 'Ajustes', 'settings.appearance': 'Apariencia', 'settings.language': 'Idioma', 'settings.currency': 'Moneda', 'settings.theme.light': 'Claro', 'settings.theme.dark': 'Oscuro', 'settings.theme.darkDim': 'Oscuro tenue', 'settings.theme.darkGray': 'Gris oscuro', 'settings.theme.system': 'Sistema',
   'common.success': 'Éxito', 'common.close': 'Cerrar', 'common.delete': 'Eliminar', 'common.cancel': 'Cancelar', 'common.apply': 'Aplicar', 'common.all': 'Todos', 'common.save': 'Guardar', 'common.name': 'Nombre', 'common.title': 'Título', 'common.notes': 'Notas', 'common.category': 'Categoría', 'common.saveAndExit': 'Guardar & Salir', 'common.saveAndAddNew': 'Guardar & Añadir Nuevo',
   'budget.summaries': 'Resúmenes', 'budget.excess': 'Exceso', 'budget.historyTitle': 'Historial de presupuesto', 'budget.plannedVsSpent': 'Planificado vs Gastado', 'budget.plannedTotal': 'Total planificado', 'budget.spentTotal': 'Total gastado', 'budget.new': 'Nuevo Presupuesto', 'budget.edit': 'Editar Presupuesto', 'budget.date': 'Fecha', 'budget.category': 'Categoría', 'budget.selectCategory': 'Seleccionar categoría', 'budget.recurring': 'Recurrente', 'budget.recurringEnd': 'Fecha de fin recurrente (incluida)', 'budget.selectRecurringEnd': 'Seleccionar fecha de fin recurrente', 'budget.amount': 'Monto', 'budget.addExpense': 'Agregar gasto', 'budget.filterByCategory': 'Filtrar por categoría', 'budget.sortBudgets': 'Ordenar presupuestos', 'budget.groupBudgets': 'Agrupar presupuestos', 'budget.deleteBudget': 'Eliminar presupuesto', 'budget.applyChangesTo': 'Aplicar cambios a', 'budget.thisOccurrence': 'Esta ocurrencia', 'budget.allRecurring': 'Todos recurrentes', 'budget.futureRecurring': 'Recurrentes futuros', 'budget.addBudget': 'Agregar presupuesto', 'budget.title': 'Título del Presupuesto', 'budget.remainingTotal': 'Total del Presupuesto Restante',
@@ -440,6 +450,8 @@ const es: Dictionary = {
 };
 
 const de: Dictionary = {
+  'home.overview': 'Übersicht',
+  'home.quickAccess': 'Schnellzugriff',
   'settings.title': 'Einstellungen', 'settings.appearance': 'Aussehen', 'settings.language': 'Sprache', 'settings.currency': 'Währung', 'settings.theme.light': 'Hell', 'settings.theme.dark': 'Dunkel', 'settings.theme.darkDim': 'Dunkel gedimmt', 'settings.theme.darkGray': 'Dunkelgrau', 'settings.theme.system': 'System',
   'common.success': 'Erfolg', 'common.close': 'Schließen', 'common.delete': 'Löschen', 'common.cancel': 'Abbrechen', 'common.apply': 'Anwenden', 'common.all': 'Alle', 'common.save': 'Speichern', 'common.name': 'Name', 'common.title': 'Titel', 'common.notes': 'Notizen', 'common.category': 'Kategorie', 'common.saveAndExit': 'Speichern & Beenden', 'common.saveAndAddNew': 'Speichern & Neu',
   'budget.summaries': 'Zusammenfassungen', 'budget.excess': 'Überschuss', 'budget.historyTitle': 'Budgetverlauf', 'budget.plannedVsSpent': 'Geplant vs Ausgegeben', 'budget.plannedTotal': 'Gesamt geplant', 'budget.spentTotal': 'Gesamt ausgegeben', 'budget.amount': 'Betrag', 'budget.addExpense': 'Ausgabe hinzufügen', 'budget.filterByCategory': 'Nach Kategorie filtern', 'budget.sortBudgets': 'Budgets sortieren', 'budget.groupBudgets': 'Budgets gruppieren', 'budget.deleteBudget': 'Budget löschen', 'budget.applyChangesTo': 'Änderungen anwenden auf', 'budget.thisOccurrence': 'Diese Instanz', 'budget.allRecurring': 'Alle wiederkehrend', 'budget.futureRecurring': 'Zukünftige wiederkehrend', 'budget.addBudget': 'Budget hinzufügen', 'budget.title': 'Budgettitel', 'budget.remainingTotal': 'Verbleibendes Budget Gesamt',
@@ -480,5 +492,3 @@ export function useI18n() {
     [locale],
   );
 }
-
-

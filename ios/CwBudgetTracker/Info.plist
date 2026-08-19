@@ -33,6 +33,10 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string/>
+	<key>NSCameraUsageDescription</key>
+	<string>Take a photo of a utility meter to read its display.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Choose a utility meter photo to read its display.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

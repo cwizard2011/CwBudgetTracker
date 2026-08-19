@@ -10,19 +10,26 @@ const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'NGN', 'JPY', 'CAD', 'AUD', '
 
 type ActiveSide = 'top' | 'bottom';
 
-export function CurrencyConverterScreen() {
+export function CurrencyConverterScreen({ route }: any) {
   const t = useI18n();
   const { locale, currency: mainCurrency } = useSettings();
   const { rates, ratesFetchedAt, hasRates } = useCurrency();
 
-  const [topCurrency, setTopCurrency] = useState(mainCurrency);
-  const [bottomCurrency, setBottomCurrency] = useState(mainCurrency === 'USD' ? 'EUR' : 'USD');
+  const requestedTop = route?.params?.fromCurrency as string | undefined;
+  const requestedBottom = route?.params?.toCurrency as string | undefined;
+  const initialTop = requestedTop && SUPPORTED_CURRENCIES.includes(requestedTop) ? requestedTop : mainCurrency;
+  const fallbackBottom = initialTop === 'USD' ? 'EUR' : 'USD';
+  const initialBottom = requestedBottom && SUPPORTED_CURRENCIES.includes(requestedBottom) && requestedBottom !== initialTop
+    ? requestedBottom
+    : fallbackBottom;
+  const [topCurrency, setTopCurrency] = useState(initialTop);
+  const [bottomCurrency, setBottomCurrency] = useState(initialBottom);
   const [topValue, setTopValue] = useState('');
   const [bottomValue, setBottomValue] = useState('');
   const [activeSide, setActiveSide] = useState<ActiveSide>('top');
 
-  const topInputRef = useRef<TextInput>(null);
-  const bottomInputRef = useRef<TextInput>(null);
+  const topInputRef = useRef<React.ElementRef<typeof TextInput>>(null);
+  const bottomInputRef = useRef<React.ElementRef<typeof TextInput>>(null);
 
   const convertAmount = useCallback((amount: string, from: string, to: string): string => {
     const num = parseFloat(amount);

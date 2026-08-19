@@ -3,8 +3,11 @@ import {
   Animated,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useSettings } from '../../context/SettingsContext';
 import { Colors } from '../../theme/colors';
@@ -51,6 +54,8 @@ function formatRate(value: number): string {
 }
 
 interface RateCard {
+  fromCurrency: string;
+  toCurrency: string;
   fromSymbol: string;
   toSymbol: string;
   rateLabel: string;
@@ -59,11 +64,13 @@ interface RateCard {
 }
 
 export function CurrencyCarousel() {
+  const navigation = useNavigation<any>();
   const { rates, hasRates, ratesFetchedAt } = useCurrency();
   const { currency: defaultCurrency, locale } = useSettings();
   const t = useI18n();
   const scrollViewRef = useRef<any>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const insetSurface = Colors.background === '#FFFFFF' ? '#F8FAFC' : Colors.background;
 
   const pairs: RateCard[] = React.useMemo(() => {
     if (!rates || !hasRates) return [];
@@ -76,10 +83,12 @@ export function CurrencyCarousel() {
       const fromRate = rates[target];
       const toRate = rates[defaultCurrency];
       if (!fromRate || !toRate) {
-        return { fromSymbol: getCurrencySymbol(target), toSymbol, rateLabel: '—', flag: CURRENCY_FLAGS[target] || '💱', key: target };
+        return { fromCurrency: target, toCurrency: defaultCurrency, fromSymbol: getCurrencySymbol(target), toSymbol, rateLabel: '—', flag: CURRENCY_FLAGS[target] || '💱', key: target };
       }
       const rateValue = toRate / fromRate;
       return {
+        fromCurrency: target,
+        toCurrency: defaultCurrency,
         fromSymbol: getCurrencySymbol(target),
         toSymbol,
         rateLabel: formatRate(rateValue),
@@ -89,16 +98,21 @@ export function CurrencyCarousel() {
     });
   }, [rates, hasRates, defaultCurrency]);
 
-  const titleLine = React.useMemo(() => {
-    if (!ratesFetchedAt) return t('currency.exchangeRates', { date: '' }).replace(/\s*\u2022\s*$/, '');
+  const headerTitle = React.useMemo(
+    () => t('currency.exchangeRates', { date: '' }).replace(/\s*\u2022\s*$/, ''),
+    [t],
+  );
+
+  const updatedLine = React.useMemo(() => {
+    if (!ratesFetchedAt) return '';
     const d = new Date(ratesFetchedAt);
     const date = d.toLocaleDateString(locale || 'en', { day: 'numeric', month: 'short', year: 'numeric' });
     const time = d.toLocaleTimeString(locale || 'en', { hour: '2-digit', minute: '2-digit' });
-    return t('currency.exchangeRates', { date: `${date}, ${time}` });
-  }, [ratesFetchedAt, locale, t]);
+    return `${date}, ${time}`;
+  }, [ratesFetchedAt, locale]);
 
-  const CARD_WIDTH = 150;
-  const CARD_MARGIN = 5;
+  const CARD_WIDTH = 132;
+  const CARD_MARGIN = 4;
   const FULL_CARD_WIDTH = CARD_WIDTH + CARD_MARGIN * 2;
 
   useEffect(() => {
@@ -118,8 +132,11 @@ export function CurrencyCarousel() {
 
   if (!hasRates || pairs.length === 0) {
     return (
-      <View style={styles.container}>
-        <View style={[styles.loadingCard, { backgroundColor: Colors.surface }]}>
+      <View style={[styles.container, { backgroundColor: Colors.surface, borderColor: Colors.border }]}>
+        <View style={styles.headerRow}>
+          <Text style={[styles.headerText, { color: Colors.heading }]}>{headerTitle}</Text>
+        </View>
+        <View style={[styles.loadingCard, { backgroundColor: insetSurface }]}>
           <Text style={[styles.loadingText, { color: Colors.mutedText }]}>{t('currency.loadingRates')}</Text>
         </View>
       </View>
@@ -127,10 +144,11 @@ export function CurrencyCarousel() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.headerText, { color: Colors.text }]} numberOfLines={1}>
-        {titleLine}
-      </Text>
+    <View style={[styles.container, { backgroundColor: Colors.surface, borderColor: Colors.border }]}>
+      <View style={styles.headerRow}>
+        <Text style={[styles.headerText, { color: Colors.heading }]} numberOfLines={1}>{headerTitle}</Text>
+        {!!updatedLine && <Text style={[styles.updatedText, { color: Colors.mutedText }]} numberOfLines={1}>{updatedLine}</Text>}
+      </View>
       <Animated.ScrollView
         ref={scrollViewRef}
         horizontal
@@ -139,25 +157,39 @@ export function CurrencyCarousel() {
         scrollEventThrottle={16}
         decelerationRate="fast"
         snapToInterval={FULL_CARD_WIDTH}
+        onMomentumScrollEnd={(event) => {
+          setCurrentIndex(Math.round(event.nativeEvent.contentOffset.x / FULL_CARD_WIDTH));
+        }}
       >
         {pairs.map((item) => (
-          <View
+          <TouchableOpacity
             key={item.key}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Convert ${item.fromCurrency} to ${item.toCurrency}`}
+            onPress={() => navigation.navigate('CurrencyConverter', {
+              fromCurrency: item.fromCurrency,
+              toCurrency: item.toCurrency,
+            })}
             style={[
               styles.rateCard,
               {
                 width: CARD_WIDTH,
                 marginHorizontal: CARD_MARGIN,
-                backgroundColor: Colors.surface,
+                backgroundColor: insetSurface,
                 borderColor: Colors.border,
               },
             ]}
           >
-            <Text style={styles.flag}>{item.flag}</Text>
+            <View style={styles.rateTopRow}>
+              <Text style={styles.flag}>{item.flag}</Text>
+              <MaterialCommunityIcons name="arrow-top-right" size={15} color={Colors.mutedText} />
+            </View>
             <Text style={[styles.rateText, { color: Colors.text }]}>
               {item.fromSymbol}1 = {item.toSymbol}{item.rateLabel}
             </Text>
-          </View>
+            <Text style={[styles.pairText, { color: Colors.mutedText }]}>{item.fromCurrency} → {item.toCurrency}</Text>
+          </TouchableOpacity>
         ))}
       </Animated.ScrollView>
       <View style={styles.dotContainer}>
@@ -179,24 +211,44 @@ export function CurrencyCarousel() {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 8,
-    marginTop: 0,
-    paddingTop: 0,
+    marginBottom: 20,
+    borderRadius: 18,
+    borderWidth: 1,
+    paddingTop: 14,
+    paddingBottom: 10,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 1,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    marginBottom: 10,
   },
   headerText: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 6,
+    flexShrink: 1,
+    fontSize: 17,
+    fontWeight: '800',
+  },
+  updatedText: {
+    fontSize: 10,
+    marginLeft: 8,
   },
   scrollContent: {
-    paddingRight: 4,
+    paddingHorizontal: 10,
   },
   rateCard: {
     borderRadius: 10,
     borderWidth: 1,
-    paddingVertical: 10,
+    minHeight: 78,
+    paddingVertical: 9,
     paddingHorizontal: 10,
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -205,12 +257,22 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   flag: {
-    fontSize: 20,
+    fontSize: 19,
+  },
+  rateTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 3,
   },
   rateText: {
     fontSize: 13,
     fontWeight: '800',
+  },
+  pairText: {
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 3,
   },
   dotContainer: {
     flexDirection: 'row',
@@ -224,9 +286,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 2.5,
   },
   loadingCard: {
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 12,
     alignItems: 'center',
+    marginHorizontal: 12,
+    marginTop: 10,
   },
   loadingText: {
     fontSize: 13,

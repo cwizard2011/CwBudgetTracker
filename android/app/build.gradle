@@ -136,8 +136,8 @@ android {
         applicationId "com.cwbudgettracker"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 24  // Increment this for each Play Store release
-        versionName "2.6.5"  // Use semantic versioning (major.minor.patch)
+        versionCode 25  // Increment this for each Play Store release
+        versionName "2.6.6"  // Use semantic versioning (major.minor.patch)
     }
     signingConfigs {
         debug {
@@ -167,7 +167,7 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }

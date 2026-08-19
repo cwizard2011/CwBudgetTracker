@@ -17,6 +17,9 @@ import { LoanProvider } from './src/context/LoanContext';
 import { SettingsProvider, useSettings } from './src/context/SettingsContext';
 import { BudgetDetailsScreen, BudgetHistoryScreen, BudgetScreen, CategoryPickerScreen, HomeScreen, LoanHistoryScreen, LoanInvoiceScreen, LoanScreen, LodgeLoanScreen, RecurringPickerScreen, SectionsScreen } from './src/screens';
 import { CurrencyConverterScreen } from './src/screens/CurrencyConverterScreen';
+import { BillMonthScreen } from './src/screens/Bills/BillMonthScreen';
+import { BillOverviewScreen } from './src/screens/Bills/BillOverviewScreen';
+import { BillsScreen } from './src/screens/Bills/BillsScreen';
 import { currencyService } from './src/services/CurrencyService';
 import { syncService } from './src/services/SyncService';
 import { Colors, applyTheme } from './src/theme/colors';
@@ -75,6 +78,9 @@ function InnerApp() {
           <Stack.Screen name="BudgetHistory" component={BudgetHistoryScreen} options={{ title: 'Budget History' }} />
           <Stack.Screen name="LoanHistory" component={LoanHistoryScreen} options={{ title: 'Loan History' }} />
           <Stack.Screen name="CurrencyConverter" component={CurrencyConverterScreen} options={{ title: 'Currency Converter' }} />
+          <Stack.Screen name="Bills" component={BillsScreen} options={{ title: 'Bills' }} />
+          <Stack.Screen name="BillOverview" component={BillOverviewScreen} options={{ title: 'Bill Tracker' }} />
+          <Stack.Screen name="BillMonth" component={BillMonthScreen} options={{ title: 'Monthly Bill' }} />
           {/* Keep legacy tabs as a separate screen if desired */}
           <Stack.Screen name="Tabs" options={{ headerShown: false }}>
             {() => (
@@ -100,4 +106,3 @@ export default function App() {
     </SettingsProvider>
   );
 }
-
