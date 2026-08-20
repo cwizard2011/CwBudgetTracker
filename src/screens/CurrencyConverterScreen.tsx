@@ -1,12 +1,11 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SUPPORTED_CURRENCIES } from '../config/currencies';
 import { useCurrency } from '../context/CurrencyContext';
 import { useSettings } from '../context/SettingsContext';
 import { Colors } from '../theme/colors';
 import { formatCurrency } from '../utils/format';
 import { useI18n } from '../utils/i18n';
-
-const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'NGN', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'BRL', 'MXN', 'KES', 'ZAR', 'GHS', 'EGP', 'SAR', 'AED', 'SGD', 'HKD'];
 
 type ActiveSide = 'top' | 'bottom';
 
@@ -17,9 +16,9 @@ export function CurrencyConverterScreen({ route }: any) {
 
   const requestedTop = route?.params?.fromCurrency as string | undefined;
   const requestedBottom = route?.params?.toCurrency as string | undefined;
-  const initialTop = requestedTop && SUPPORTED_CURRENCIES.includes(requestedTop) ? requestedTop : mainCurrency;
+  const initialTop = requestedTop && (SUPPORTED_CURRENCIES as readonly string[]).includes(requestedTop) ? requestedTop : mainCurrency;
   const fallbackBottom = initialTop === 'USD' ? 'EUR' : 'USD';
-  const initialBottom = requestedBottom && SUPPORTED_CURRENCIES.includes(requestedBottom) && requestedBottom !== initialTop
+  const initialBottom = requestedBottom && (SUPPORTED_CURRENCIES as readonly string[]).includes(requestedBottom) && requestedBottom !== initialTop
     ? requestedBottom
     : fallbackBottom;
   const [topCurrency, setTopCurrency] = useState(initialTop);

@@ -136,8 +136,8 @@ android {
         applicationId "com.cwbudgettracker"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 25  // Increment this for each Play Store release
-        versionName "2.6.6"  // Use semantic versioning (major.minor.patch)
+        versionCode 26  // Increment this for each Play Store release
+        versionName "2.6.7"  // Use semantic versioning (major.minor.patch)
     }
     signingConfigs {
         debug {
@@ -185,5 +185,10 @@ dependencies {
     implementation platform("com.google.firebase:firebase-bom:32.7.4")
 }
 
-// Ensure vector icon fonts are bundled into the app
+// Bundle only icon families imported by the app instead of all 19 families.
+project.ext.vectoricons = [
+    iconFontNames: ["MaterialIcons.ttf", "MaterialCommunityIcons.ttf"]
+]
+
+// Ensure the selected vector icon fonts are bundled into the app
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"

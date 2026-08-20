@@ -1,6 +1,6 @@
 {
   "name": "CwBudgetTracker",
-  "version": "2.6.6",
+  "version": "2.6.7",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -8,8 +8,8 @@
     "android:install": "adb install -r ./android/app/build/outputs/apk/release/app-release.apk",
     "android:update": "cd android && ./gradlew assembleDebug && adb install -r ./app/build/outputs/apk/debug/app-debug.apk",
     "android:update:release": "cd android && ./gradlew assembleRelease && adb install -r ./app/build/outputs/apk/release/app-release.apk",
-    "android:bundle:release": "cd android && cross-env NODE_ENV=production ./gradlew bundleRelease",
-    "android:assemble:release": "cd android && cross-env NODE_ENV=production ./gradlew assembleRelease",
+    "android:bundle:release": "cd android && cross-env NODE_ENV=production ./gradlew bundleRelease -PreactNativeArchitectures=armeabi-v7a,arm64-v8a",
+    "android:assemble:release": "cd android && cross-env NODE_ENV=production ./gradlew assembleRelease -PreactNativeArchitectures=armeabi-v7a,arm64-v8a",
     "ios:device:build": "cd ios && xcodebuild -workspace CwBudgetTracker.xcworkspace -scheme CwBudgetTracker -configuration Debug -destination 'id=$DEVICE_ID' -allowProvisioningUpdates -derivedDataPath /tmp/CwBTBuild build",
     "ios:device:install": "xcrun devicectl device install app --device $DEVICE_ID /tmp/CwBTBuild/Build/Products/Debug-iphoneos/CwBudgetTracker.app",
     "ios:device:update": "npm run ios:device:build && npm run ios:device:install",

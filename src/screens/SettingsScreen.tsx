@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { errorCodes, isErrorWithCode, keepLocalCopy, pick, types } from '@react-native-documents/picker';
 import { Button } from '../components/ui/Button';
 import { PromptModal } from '../components/ui/PromptModal';
+import { SUPPORTED_CURRENCIES } from '../config/currencies';
 import { useSettings } from '../context/SettingsContext';
 import { backupService } from '../services/BackupService';
 import { googleDriveBackupService } from '../services/GoogleDriveBackupService';
@@ -15,8 +16,6 @@ import {
 } from '../utils/googleSignInErrors';
 import { useI18n } from '../utils/i18n';
 import { navigate as rootNavigate } from '../utils/navigationRef';
-
-const ALL_CURRENCIES = ['USD', 'EUR', 'GBP', 'NGN', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'BRL', 'MXN', 'KES', 'ZAR', 'GHS', 'EGP', 'SAR', 'AED', 'SGD', 'HKD'];
 
 export function SettingsScreen() {
   const { theme, setTheme, locale, setLocale, currency, setCurrency, secondaryCurrency, setSecondaryCurrency } = useSettings();
@@ -220,7 +219,7 @@ export function SettingsScreen() {
 
       <Text style={styles.section}>{t('settings.currency')}</Text>
       <View style={styles.row}>
-        {ALL_CURRENCIES.map(c => (
+        {SUPPORTED_CURRENCIES.map(c => (
           <Button key={c} title={c} variant={currency === c ? 'primary' : 'neutral'} onPress={() => setCurrency(c)} style={styles.mr} />
         ))}
       </View>
@@ -228,7 +227,7 @@ export function SettingsScreen() {
       <Text style={styles.section}>{t('settings.secondaryCurrency')}</Text>
       <Text style={styles.help}>{t('settings.secondaryCurrencyHelp')}</Text>
       <View style={styles.row}>
-        {ALL_CURRENCIES.map(c => (
+        {SUPPORTED_CURRENCIES.map(c => (
           <Button key={c} title={c} variant={secondaryCurrency === c ? 'secondary' : 'neutral'} onPress={() => setSecondaryCurrency(c)} style={styles.mr} />
         ))}
       </View>
@@ -335,5 +334,4 @@ export function SettingsScreen() {
     </ScrollView>
   );
 }
-
 

@@ -18,4 +18,7 @@ export function formatCurrency(amount: number, locale: string, currency: string)
   }
 }
 
+export function formatCurrencyWithCode(amount: number, locale: string, currency: string): string {
+  return `${formatCurrency(amount, locale, currency)} ${currency}`;
+}
 

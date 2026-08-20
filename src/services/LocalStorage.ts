@@ -85,12 +85,12 @@ export class LocalStorage {
   }
 
   /* Settings */
-  static async getSettings(): Promise<{ theme: 'light'|'dark'|'darkDim'|'darkGray'|'system'; locale: string; currency: string; secondaryCurrency?: string } | null> {
+  static async getSettings(): Promise<{ theme: 'light'|'dark'|'darkDim'|'darkGray'|'system'; locale: string; currency: string; secondaryCurrency?: string; billCurrency?: string } | null> {
     const raw = await AsyncStorage.getItem(KEY_SETTINGS);
     return raw ? JSON.parse(raw) : null;
   }
 
-  static async saveSettings(value: { theme: 'light'|'dark'|'darkDim'|'darkGray'|'system'; locale: string; currency: string; secondaryCurrency?: string }) {
+  static async saveSettings(value: { theme: 'light'|'dark'|'darkDim'|'darkGray'|'system'; locale: string; currency: string; secondaryCurrency?: string; billCurrency?: string }) {
     await AsyncStorage.setItem(KEY_SETTINGS, JSON.stringify(value));
   }
 }
