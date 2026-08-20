@@ -38,11 +38,11 @@ limit internally, but do not include character-count annotations in the file.
 Follow this format:
 
 ### Supported Locales:
-- **EN** (English)
-- **PT** (Portuguese)
-- **FR** (French)
-- **ES** (Spanish)
-- **DE** (German)
+- **en-US** (English)
+- **pt-PT** (Portuguese)
+- **fr-FR** (French)
+- **es-ES** (Spanish)
+- **de-DE** (German)
 
 ### Create a file: `RELEASE_NOTES.md`
 
@@ -51,20 +51,25 @@ Format for each locale:
 ```markdown
 ## Release X.Y.Z - [Release Date]
 
-### EN (English)
+<en-US>
 [Max 500 characters describing the changes, improvements, and bug fixes]
+</en-US>
 
-### PT (Portuguese)
+<pt-PT>
 [Max 500 characters describing the changes, improvements, and bug fixes in Portuguese]
+</pt-PT>
 
-### FR (French)
+<fr-FR>
 [Max 500 characters describing the changes, improvements, and bug fixes in French]
+</fr-FR>
 
-### ES (Spanish)
+<es-ES>
 [Max 500 characters describing the changes, improvements, and bug fixes in Spanish]
+</es-ES>
 
-### DE (German)
+<de-DE>
 [Max 500 characters describing the changes, improvements, and bug fixes in German]
+</de-DE>
 ```
 
 ### Example Release Notes Structure:
@@ -72,7 +77,7 @@ Format for each locale:
 ```markdown
 ## Release 2.3.0 - May 2, 2026
 
-### EN (English)
+<en-US>
 ✨ New Features:
 - Improved home screen layout with better spacing
 - Enhanced user interface responsiveness
@@ -82,8 +87,9 @@ Format for each locale:
 - Optimized layout calculations
 
 📱 Overall: BudgetTracker 2.3.0 brings UI refinements and stability improvements for a better budgeting experience.
+</en-US>
 
-### PT (Portuguese)
+<pt-PT>
 ✨ Novas Funcionalidades:
 - Layout melhorado da tela inicial com melhor espaçamento
 - Interface do usuário mais responsiva
@@ -93,8 +99,9 @@ Format for each locale:
 - Cálculos de layout otimizados
 
 📱 Geral: BudgetTracker 2.3.0 traz refinamentos de UI e melhorias de estabilidade para uma melhor experiência de orçamento.
+</pt-PT>
 
-### FR (French)
+<fr-FR>
 ✨ Nouvelles Fonctionnalités:
 - Disposition améliorée de l'écran d'accueil avec meilleur espacement
 - Interface utilisateur plus réactive
@@ -104,8 +111,9 @@ Format for each locale:
 - Calculs de disposition optimisés
 
 📱 Général: BudgetTracker 2.3.0 apporte des raffinements d'interface et des améliorations de stabilité pour une meilleure expérience budgétaire.
+</fr-FR>
 
-### ES (Spanish)
+<es-ES>
 ✨ Nuevas Funcionalidades:
 - Diseño mejorado de la pantalla de inicio con mejor espaciado
 - Interfaz de usuario más receptiva
@@ -115,8 +123,9 @@ Format for each locale:
 - Cálculos de diseño optimizados
 
 📱 General: BudgetTracker 2.3.0 trae refinamientos de interfaz y mejoras de estabilidad para una mejor experiencia presupuestaria.
+</es-ES>
 
-### DE (German)
+<de-DE>
 ✨ Neue Funktionen:
 - Verbessertes Startbildschirm-Layout mit besserer Abstände
 - Reaktionsfähigere Benutzeroberfläche
@@ -126,6 +135,7 @@ Format for each locale:
 - Layout-Berechnungen optimiert
 
 📱 Gesamt: BudgetTracker 2.3.0 bringt UI-Verfeinerungen und Stabilitätsverbesserungen für ein besseres Budget-Erlebnis.
+</de-DE>
 ```
 
 ---

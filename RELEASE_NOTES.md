@@ -2,7 +2,7 @@
 
 ## Release 2.6.9 - August 20, 2026
 
-### EN (English)
+<en-US>
 ✨ What's new
 • Track electricity separately for off-peak, peak and mid-peak hours, with an optional price for each band
 • Crop any meter photo so OCR focuses only on the reading
@@ -10,8 +10,9 @@
 • Choose each bill month's currency; device-region suggestions need no location permission
 • Bills are included in local and Google Drive backup and restore
 • Smaller, optimized Android download
+</en-US>
 
-### PT (Portuguese)
+<pt-PT>
 ✨ Novidades
 • Registe eletricidade por horário fora de ponta, ponta e intermédio, com preço opcional por faixa
 • Recorte a foto do contador para o OCR focar apenas a leitura
@@ -19,8 +20,9 @@
 • Escolha a moeda mensal; a sugestão regional não requer localização
 • Contas incluídas no backup e restauro local e Google Drive
 • Download Android menor e otimizado
+</pt-PT>
 
-### FR (French)
+<fr-FR>
 ✨ Nouveautés
 • Suivez l'électricité par heures creuses, de pointe et intermédiaires, avec un tarif facultatif par plage
 • Recadrez la photo pour que l'OCR cible uniquement le relevé
@@ -28,8 +30,9 @@
 • Choisissez la devise mensuelle; la suggestion régionale n'utilise pas la localisation
 • Factures incluses dans la sauvegarde locale et Google Drive
 • Téléchargement Android réduit et optimisé
+</fr-FR>
 
-### ES (Spanish)
+<es-ES>
 ✨ Novedades
 • Registra electricidad por horas valle, punta y llano, con precio opcional para cada tramo
 • Recorta la foto para que el OCR se centre solo en la lectura
@@ -37,8 +40,9 @@
 • Elige la moneda mensual; la sugerencia regional no usa la ubicación
 • Facturas incluidas en la copia local y de Google Drive
 • Descarga de Android más pequeña y optimizada
+</es-ES>
 
-### DE (German)
+<de-DE>
 ✨ Neuigkeiten
 • Strom nach Neben-, Hoch- und Mittellastzeit erfassen, optional mit eigenem Preis je Zeitraum
 • Zählerfoto zuschneiden, damit OCR nur den Zählerstand erfasst
@@ -46,3 +50,4 @@
 • Monatswährung wählen; der Regionsvorschlag benötigt keinen Standortzugriff
 • Rechnungen sind in lokalen und Google-Drive-Backups enthalten
 • Kleinerer, optimierter Android-Download
+</de-DE>
