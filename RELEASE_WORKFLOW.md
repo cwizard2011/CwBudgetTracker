@@ -33,7 +33,9 @@ git commit -m "Bump version to X.Y.Z for Play Store release"
 
 ## Step 2: Create Release Notes for All Locales
 
-Release notes must be **500 characters maximum** for each locale. Follow this format:
+Release notes must be **500 characters maximum** for each locale. Validate the
+limit internally, but do not include character-count annotations in the file.
+Follow this format:
 
 ### Supported Locales:
 - **EN** (English)
@@ -80,7 +82,6 @@ Format for each locale:
 - Optimized layout calculations
 
 📱 Overall: BudgetTracker 2.3.0 brings UI refinements and stability improvements for a better budgeting experience.
-[Character count: 245/500]
 
 ### PT (Portuguese)
 ✨ Novas Funcionalidades:
@@ -92,7 +93,6 @@ Format for each locale:
 - Cálculos de layout otimizados
 
 📱 Geral: BudgetTracker 2.3.0 traz refinamentos de UI e melhorias de estabilidade para uma melhor experiência de orçamento.
-[Character count: 285/500]
 
 ### FR (French)
 ✨ Nouvelles Fonctionnalités:
@@ -104,7 +104,6 @@ Format for each locale:
 - Calculs de disposition optimisés
 
 📱 Général: BudgetTracker 2.3.0 apporte des raffinements d'interface et des améliorations de stabilité pour une meilleure expérience budgétaire.
-[Character count: 290/500]
 
 ### ES (Spanish)
 ✨ Nuevas Funcionalidades:
@@ -116,7 +115,6 @@ Format for each locale:
 - Cálculos de diseño optimizados
 
 📱 General: BudgetTracker 2.3.0 trae refinamientos de interfaz y mejoras de estabilidad para una mejor experiencia presupuestaria.
-[Character count: 280/500]
 
 ### DE (German)
 ✨ Neue Funktionen:
@@ -128,7 +126,6 @@ Format for each locale:
 - Layout-Berechnungen optimiert
 
 📱 Gesamt: BudgetTracker 2.3.0 bringt UI-Verfeinerungen und Stabilitätsverbesserungen für ein besseres Budget-Erlebnis.
-[Character count: 285/500]
 ```
 
 ---

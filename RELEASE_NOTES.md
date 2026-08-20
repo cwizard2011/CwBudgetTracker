@@ -11,8 +11,6 @@
 • Bills are included in local and Google Drive backup and restore
 • Smaller, optimized Android download
 
-[Character count: 485/500]
-
 ### PT (Portuguese)
 ✨ Novidades
 • Registe eletricidade por horário fora de ponta, ponta e intermédio, com preço opcional por faixa
@@ -21,8 +19,6 @@
 • Escolha a moeda mensal; a sugestão regional não requer localização
 • Contas incluídas no backup e restauro local e Google Drive
 • Download Android menor e otimizado
-
-[Character count: 447/500]
 
 ### FR (French)
 ✨ Nouveautés
@@ -33,8 +29,6 @@
 • Factures incluses dans la sauvegarde locale et Google Drive
 • Téléchargement Android réduit et optimisé
 
-[Character count: 484/500]
-
 ### ES (Spanish)
 ✨ Novedades
 • Registra electricidad por horas valle, punta y llano, con precio opcional para cada tramo
@@ -44,8 +38,6 @@
 • Facturas incluidas en la copia local y de Google Drive
 • Descarga de Android más pequeña y optimizada
 
-[Character count: 440/500]
-
 ### DE (German)
 ✨ Neuigkeiten
 • Strom nach Neben-, Hoch- und Mittellastzeit erfassen, optional mit eigenem Preis je Zeitraum
@@ -54,5 +46,3 @@
 • Monatswährung wählen; der Regionsvorschlag benötigt keinen Standortzugriff
 • Rechnungen sind in lokalen und Google-Drive-Backups enthalten
 • Kleinerer, optimierter Android-Download
-
-[Character count: 454/500]
