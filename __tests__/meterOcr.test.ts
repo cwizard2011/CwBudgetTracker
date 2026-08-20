@@ -14,7 +14,7 @@ describe('meter OCR candidate selection', () => {
       }],
     };
 
-    expect(readingCandidates(result, 'water', undefined, { width: 4032, height: 3024 })[0]).toBe(39.5);
+    expect(readingCandidates(result, 'water', undefined, { width: 4032, height: 3024 })[0]).toBe(395);
   });
 
   it('ignores a trailing red decimal wheel when OCR joins it to the black register', () => {
@@ -22,7 +22,7 @@ describe('meter OCR candidate selection', () => {
       text: '003953',
       blocks: [{ lines: [{ text: '003953', frame: { left: 900, top: 1150, width: 1150, height: 220 } }] }],
     };
-    expect(readingCandidates(result, 'water', undefined, { width: 4032, height: 3024 })[0]).toBe(39.5);
+    expect(readingCandidates(result, 'water', undefined, { width: 4032, height: 3024 })[0]).toBe(395);
   });
 
   it('normalizes letters commonly confused with digits on a numeric display', () => {
@@ -30,7 +30,11 @@ describe('meter OCR candidate selection', () => {
       text: 'OO395',
       blocks: [{ lines: [{ text: 'OO395', frame: { left: 100, top: 100, width: 500, height: 100 } }] }],
     };
-    expect(readingCandidates(result, 'water')[0]).toBe(39.5);
+    expect(readingCandidates(result, 'water')[0]).toBe(395);
+  });
+
+  it('ignores explicitly separated red water wheels', () => {
+    expect(readingCandidates('00395,3 m³', 'water')[0]).toBe(395);
   });
 
   it('does not apply mechanical decimal inference to electricity meters', () => {

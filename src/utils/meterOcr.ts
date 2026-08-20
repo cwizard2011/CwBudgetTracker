@@ -187,17 +187,19 @@ export function readingCandidates(
         }
       }
 
-      if (billType === 'water' && !hasExplicitDecimal && /^0\d{4,7}$/.test(digits)) {
-        // This common five-wheel water style uses the last black digit as a
-        // tenth of a cubic metre. A trailing red wheel is ignored.
-        const fiveWheelRegister = Number(digits.slice(0, 5)) / 10;
-        addCandidate(scored, fiveWheelRegister, score + (digits.length === 5 ? 11 : 13));
-
-        const preferredDivisor = digits.length >= 7 ? 1000 : 10;
-        addCandidate(scored, value / preferredDivisor, score + 6);
-        [10, 100, 1000].filter(divisor => divisor !== preferredDivisor).forEach(divisor => {
-          addCandidate(scored, value / divisor, score + 1);
-        });
+      if (billType === 'water' && /^0\d{4,7}$/.test(digits)) {
+        const groups = raw.trim().split(/[.,\s]+/).filter(Boolean);
+        const groupedRegister = groups.length >= 2
+          && groups[0].replace(/\D/g, '').length === 5
+          && groups.slice(1).join('').replace(/\D/g, '').length >= 1
+          && groups.slice(1).join('').replace(/\D/g, '').length <= 3;
+        const joinedRegister = !hasExplicitDecimal && digits.length >= 6 && digits.length <= 8;
+        const fiveBlackWheels = digits.length === 5;
+        if (fiveBlackWheels || groupedRegister || joinedRegister) {
+          // Water readings use the five black wheels as whole cubic metres.
+          // Any following red wheels are decimal fractions and are discarded.
+          addCandidate(scored, Number(digits.slice(0, 5)), score + (fiveBlackWheels ? 18 : 24));
+        }
       }
     });
   });
